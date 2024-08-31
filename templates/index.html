@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="{{ url_for('static',filename='css/Contact-info.css') }}">
     <link rel="stylesheet" href="{{ url_for('static',filename='css/setings.css') }}">
     <link rel="stylesheet" href="{{ url_for('static',filename='css/newChat.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static',filename='css/status.css') }}">
+    <!-- <link rel="stylesheet" href="{{ url_for('static',filename='css/status.css') }}"> -->
     <link rel="stylesheet" href="{{ url_for('static',filename='css/intro.css') }}">
     <link rel="stylesheet" href="{{ url_for('static',filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static',filename='css/group.css') }}">
@@ -74,17 +74,7 @@
                 <div class="ICON">
                     <img src="{{url_for('static',filename='images/Sun-1.png')}}" alt="" id="moon" class="icons" title="Light Mode"
                         aria-label="Light Mode">
-                    <button role="button" class="icons" onclick="openStatus()">
-                        <span class="">
-                            <svg version="1.1" x="0" y="0" viewBox="0 0 24 24" width="24" height="24" class="">
-                                <path fill="currentColor"
-                                    d="M12.072 1.761a10.05 10.05 0 0 0-9.303 5.65.977.977 0 0 0 1.756.855 8.098 8.098 0 0 1 7.496-4.553.977.977 0 1 0 .051-1.952zM1.926 13.64a10.052 10.052 0 0 0 7.461 7.925.977.977 0 0 0 .471-1.895 8.097 8.097 0 0 1-6.012-6.386.977.977 0 0 0-1.92.356zm13.729 7.454a10.053 10.053 0 0 0 6.201-8.946.976.976 0 1 0-1.951-.081v.014a8.097 8.097 0 0 1-4.997 7.209.977.977 0 0 0 .727 1.813l.02-.009z">
-                                </path>
-                                <path fill="#009588" d="M19 1.5a3 3 0 1 1 0 6 3 3 0 0 1 0-6z">
-                                </path>
-                            </svg>
-                        </span>
-                    </button>
+                    
 
                     <button role="button" class="icons" onclick="openForm()">
                         <span class="">
@@ -135,7 +125,7 @@
             <!-- Chats Box -->
             <div class="chats">
                 <!-- Chats 1 -->
-                <div class="block chat-list" onclick="openRightSide()">
+                <div class="block chat-list" onclick="openChat({{ chat.user.id }})">
                     <!-- Img -->
                     <div class="imgBox">
                         <img src="{{url_for('static',filename='images/Avatar-7.jpeg')}}" class="cover">
@@ -172,310 +162,27 @@
                     </div>
                 </div>
 
-                <!-- Chats 2 -->
-                <div class="block chat-list">
+                {% for chat in chats %}
+                <div class="block chat-list" onclick="openChat({{ chat.user.id }})">
                     <!-- Img -->
                     <div class="imgBox">
-                        <img src="{{url_for('static',filename='images/avatar-3.png')}}" class="cover">
+                        <img src="{{ url_for('static', filename='images/' + chat.user.avatar) }}" class="cover">
                     </div>
                     <!-- Text -->
                     <div class="h-text">
                         <div class="head">
-                            <h4 title="Ashlar" aria-label="Ashlar">Ashlar</h4>
-                            <p class="time">7:30 PM</p>
+                            <h4 title="{{ chat.user.name }}" aria-label="{{ chat.user.name }}">{{ chat.user.name }}</h4>
+                            <p class="time">{{ chat.last_message.timestamp.strftime('%I:%M %p') if chat.last_message else '' }}</p>
                         </div>
                         <div class="message-chat">
-                            <div class="tick-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="20" height="20"
-                                    aria-label="read" class="blue-tick">
-                                    <path fill="currentColor"
-                                        d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L8.666 9.879a.32.32 0 0 1-.484.033l-.358-.325a.319.319 0 0 0-.484.032l-.378.483a.418.418 0 0 0 .036.541l1.32 1.266c.143.14.361.125.484-.033l6.272-8.048a.366.366 0 0 0-.064-.512zm-4.1 0l-.478-.372a.365.365 0 0 0-.51.063L4.566 9.879a.32.32 0 0 1-.484.033L1.891 7.769a.366.366 0 0 0-.515.006l-.423.433a.364.364 0 0 0 .006.514l3.258 3.185c.143.14.361.125.484-.033l6.272-8.048a.365.365 0 0 0-.063-.51z">
-                                    </path>
-                                </svg>
-                            </div>
-
                             <div class="chat-text-icon">
-                                <span class="thanks">Thank you.</span>
-                                <div class="icon-more">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19 20" width="19" height="20"
-                                        class="hide animate__animated animate__fadeInUp">
-                                        <path fill="currentColor"
-                                            d="M3.8 6.7l5.7 5.7 5.7-5.7 1.6 1.6-7.3 7.2-7.3-7.2 1.6-1.6z">
-                                        </path>
-                                    </svg>
-                                </div>
+                                <span class="thanks">{{ chat.last_message.content if chat.last_message else 'No messages yet' }}</span>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <!-- Chats 3 -->
-                <div class="block chat-list">
-                    <!-- Img -->
-                    <div class="imgBox">
-                        <img src="{{url_for('static',filename='images/Avatar-1.png')}}" class="cover">
-                    </div>
-                    <!-- Text -->
-                    <div class="h-text">
-                        <div class="head">
-                            <h4 title="Olivia" aria-label="Olivia">Olivia</h4>
-                            <p class="time">yesterday</p>
-                        </div>
-                        <div class="message-chat">
-                            <div class="chat-text-icon">
-                                <span class="thanks">Hi, i found you on github</span>
-                                <div class="unread">
-                                    <span class="numb">1</span>
-                                    <div class="icon-more">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19 20" width="19"
-                                            height="20" class="hide animate__animated animate__fadeInUp">
-                                            <path fill="currentColor"
-                                                d="M3.8 6.7l5.7 5.7 5.7-5.7 1.6 1.6-7.3 7.2-7.3-7.2 1.6-1.6z">
-                                            </path>
-                                        </svg>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Chats 4 -->
-                <div class="block chat-list">
-                    <!-- Img -->
-                    <div class="imgBox">
-                        <img src="{{url_for('static',filename='images/Avatar-2.png')}}" class="cover">
-                    </div>
-                    <!-- Text -->
-                    <div class="h-text">
-                        <div class="head">
-                            <h4 title="Amelia" aria-label="Amelia">Amelia</h4>
-                            <p class="time">yesterday</p>
-                        </div>
-                        <div class="message-chat">
-                            <div class="chat-text-icon">
-                                <span class="thanks">Hello...</span>
-                                <div class="unread">
-                                    <span class="numb">3</span>
-                                    <div class="icon-more">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19 20" width="19"
-                                            height="20" class="hide animate__animated animate__fadeInUp">
-                                            <path fill="currentColor"
-                                                d="M3.8 6.7l5.7 5.7 5.7-5.7 1.6 1.6-7.3 7.2-7.3-7.2 1.6-1.6z">
-                                            </path>
-                                        </svg>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Chats 5 -->
-                <div class="block chat-list">
-                    <!-- Img -->
-                    <div class="imgBox">
-                        <img src="{{url_for('static',filename='images/Avatar-5.jpeg')}}" class="cover">
-                    </div>
-                    <!-- Text -->
-                    <div class="h-text">
-                        <div class="head">
-                            <h4 title="Raoul" aria-label="Raoul">Raoul</h4>
-                            <p class="time">yesterday</p>
-                        </div>
-                        <div class="message-chat">
-                            <div class="tick-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="20" height="20"
-                                    aria-label="read" class="blue-tick">
-                                    <path fill="currentColor"
-                                        d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L8.666 9.879a.32.32 0 0 1-.484.033l-.358-.325a.319.319 0 0 0-.484.032l-.378.483a.418.418 0 0 0 .036.541l1.32 1.266c.143.14.361.125.484-.033l6.272-8.048a.366.366 0 0 0-.064-.512zm-4.1 0l-.478-.372a.365.365 0 0 0-.51.063L4.566 9.879a.32.32 0 0 1-.484.033L1.891 7.769a.366.366 0 0 0-.515.006l-.423.433a.364.364 0 0 0 .006.514l3.258 3.185c.143.14.361.125.484-.033l6.272-8.048a.365.365 0 0 0-.063-.51z">
-                                    </path>
-                                </svg>
-                            </div>
-
-                            <div class="chat-text-icon">
-                                <span class="thanks">oh okay.</span>
-                                <div class="icon-more">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19 20" width="19" height="20"
-                                        class="hide animate__animated animate__fadeInUp">
-                                        <path fill="currentColor"
-                                            d="M3.8 6.7l5.7 5.7 5.7-5.7 1.6 1.6-7.3 7.2-7.3-7.2 1.6-1.6z">
-                                        </path>
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Chats 6 -->
-                <div class="block chat-list">
-                    <!-- Img -->
-                    <div class="imgBox">
-                        <img src="{{url_for('static',filename='images/Avatar-16.jpeg')}}" class="cover">
-                    </div>
-                    <!-- Text -->
-                    <div class="h-text">
-                        <div class="head">
-                            <h4 title="Joseph" aria-label="Joseph">Joseph</h4>
-                            <p class="time">8/12/2022</p>
-                        </div>
-                        <div class="message-chat">
-                            <div class="tick-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="20" height="20"
-                                    aria-label="read" class="blue-tick">
-                                    <path fill="currentColor"
-                                        d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L8.666 9.879a.32.32 0 0 1-.484.033l-.358-.325a.319.319 0 0 0-.484.032l-.378.483a.418.418 0 0 0 .036.541l1.32 1.266c.143.14.361.125.484-.033l6.272-8.048a.366.366 0 0 0-.064-.512zm-4.1 0l-.478-.372a.365.365 0 0 0-.51.063L4.566 9.879a.32.32 0 0 1-.484.033L1.891 7.769a.366.366 0 0 0-.515.006l-.423.433a.364.364 0 0 0 .006.514l3.258 3.185c.143.14.361.125.484-.033l6.272-8.048a.365.365 0 0 0-.063-.51z">
-                                    </path>
-                                </svg>
-                            </div>
-
-                            <div class="chat-text-icon">
-                                <span class="thanks">we are done with the project</span>
-                                <div class="icon-more">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19 20" width="19" height="20"
-                                        class="hide animate__animated animate__fadeInUp">
-                                        <path fill="currentColor"
-                                            d="M3.8 6.7l5.7 5.7 5.7-5.7 1.6 1.6-7.3 7.2-7.3-7.2 1.6-1.6z">
-                                        </path>
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Chats 7 -->
-                <div class="block chat-list">
-                    <!-- Img -->
-                    <div class="imgBox">
-                        <img src="{{url_for('static',filename='images/Avatar-11.jpg')}}" class="cover">
-                    </div>
-                    <!-- Text -->
-                    <div class="h-text">
-                        <div class="head">
-                            <h4 title="Diana" aria-label="Diana">Diana</h4>
-                            <p class="time">8/8/2022</p>
-                        </div>
-                        <div class="message-chat">
-                            <div class="chat-text-icon">
-                                <span class="thanks">please wait..</span>
-                                <div class="icon-more">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19 20" width="19" height="20"
-                                        class="hide animate__animated animate__fadeInUp">
-                                        <path fill="currentColor"
-                                            d="M3.8 6.7l5.7 5.7 5.7-5.7 1.6 1.6-7.3 7.2-7.3-7.2 1.6-1.6z">
-                                        </path>
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Chats 8 -->
-                <div class="block chat-list">
-                    <!-- Img -->
-                    <div class="imgBox">
-                        <img src="{{url_for('static',filename='images/avatar-8.jpeg')}}" class="cover">
-                    </div>
-                    <!-- Text -->
-                    <div class="h-text">
-                        <div class="head">
-                            <h4 title="Kabir" aria-label="Kabir">Kabir</h4>
-                            <p class="time">8/6/2022</p>
-                        </div>
-                        <div class="message-chat">
-                            <div class="tick-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="20" height="20"
-                                    aria-label="read" class="white-tick">
-                                    <path fill="currentColor"
-                                        d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L8.666 9.879a.32.32 0 0 1-.484.033l-.358-.325a.319.319 0 0 0-.484.032l-.378.483a.418.418 0 0 0 .036.541l1.32 1.266c.143.14.361.125.484-.033l6.272-8.048a.366.366 0 0 0-.064-.512zm-4.1 0l-.478-.372a.365.365 0 0 0-.51.063L4.566 9.879a.32.32 0 0 1-.484.033L1.891 7.769a.366.366 0 0 0-.515.006l-.423.433a.364.364 0 0 0 .006.514l3.258 3.185c.143.14.361.125.484-.033l6.272-8.048a.365.365 0 0 0-.063-.51z">
-                                    </path>
-                                </svg>
-                            </div>
-
-                            <div class="chat-text-icon">
-                                <span class="thanks">Happy Birthday</span>
-                                <div class="icon-more">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19 20" width="19" height="20"
-                                        class="hide animate__animated animate__fadeInUp">
-                                        <path fill="currentColor"
-                                            d="M3.8 6.7l5.7 5.7 5.7-5.7 1.6 1.6-7.3 7.2-7.3-7.2 1.6-1.6z">
-                                        </path>
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Chats 9 -->
-                <div class="block chat-list">
-                    <!-- Img -->
-                    <div class="imgBox">
-                        <img src="{{url_for('static',filename='images/Avatar-15.jpeg')}}" class="cover">
-                    </div>
-                    <!-- Text -->
-                    <div class="h-text">
-                        <div class="head">
-                            <h4 title="Grace" aria-label="Grace">Grace</h4>
-                            <p class="time">3/4/2022</p>
-                        </div>
-                        <div class="message-chat">
-                            <div class="tick-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="20" height="20"
-                                    class="white-tick">
-                                    <path fill="currentColor"
-                                        d="m10.91 3.316-.478-.372a.365.365 0 0 0-.51.063L4.566 9.879a.32.32 0 0 1-.484.033L1.891 7.769a.366.366 0 0 0-.515.006l-.423.433a.364.364 0 0 0 .006.514l3.258 3.185c.143.14.361.125.484-.033l6.272-8.048a.365.365 0 0 0-.063-.51z">
-                                    </path>
-                                </svg>
-                            </div>
-
-                            <div class="chat-text-icon">
-                                <span class="thanks">Thank you for your help.</span>
-                                <div class="icon-more">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19 20" width="19" height="20"
-                                        class="hide animate__animated animate__fadeInUp">
-                                        <path fill="currentColor"
-                                            d="M3.8 6.7l5.7 5.7 5.7-5.7 1.6 1.6-7.3 7.2-7.3-7.2 1.6-1.6z">
-                                        </path>
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Chats 10 -->
-                <div class="block chat-list">
-                    <!-- Img -->
-                    <div class="imgBox">
-                        <img src="{{url_for('static',filename='images/Avatar-10.jpeg')}}" class="cover">
-                    </div>
-                    <!-- Text -->
-                    <div class="h-text">
-                        <div class="head">
-                            <h4 title="Adeboye" aria-label="Adeboye">Adeboye</h4>
-                            <p class="time">29/5/2022</p>
-                        </div>
-                        <div class="message-chat">
-                            <div class="chat-text-icon">
-                                <span class="thanks">Messages are end-to-end encrypted. No one outside of this chat, not
-                                    even WhatsApp, can
-                                    read or listen to them. Click to learn more.</span>
-                                <div class="icon-more">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19 20" width="19" height="20"
-                                        class="hide animate__animated animate__fadeInUp">
-                                        <path fill="currentColor"
-                                            d="M3.8 6.7l5.7 5.7 5.7-5.7 1.6 1.6-7.3 7.2-7.3-7.2 1.6-1.6z">
-                                        </path>
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                {% endfor %}
+                
 
                 
 
@@ -881,7 +588,7 @@
                 <div class="block">
                     <!-- Img -->
                     <div class="imgBox">
-                        <img src="images/Avatar-16.jpeg" class="cover">
+                        <img src="{{url_for('static',filename='images/Avatar-16.jpeg')}}" class="cover">
                     </div>
                     <!-- Text -->
                     <div class="h-text">
@@ -900,7 +607,7 @@
                 <div class="block">
                     <!-- Img -->
                     <div class="imgBox">
-                        <img src="images/Avatar-11.jpg" class="cover">
+                        <img src="{{url_for('static',filename='images/Avatar-11.jpg')}}" class="cover">
                     </div>
                     <!-- Text -->
                     <div class="h-text">
@@ -919,7 +626,7 @@
                 <div class="block">
                     <!-- Img -->
                     <div class="imgBox">
-                        <img src="images/avatar-3.png" class="cover">
+                        <img src="{{url_for('static',filename='images/avatar-3.png')}}" class="cover">
                     </div>
                     <!-- Text -->
                     <div class="h-text">
@@ -936,7 +643,7 @@
                 <div class="block">
                     <!-- Img -->
                     <div class="imgBox">
-                        <img src="images/Avatar-15.jpeg" class="cover">
+                        <img src="{{url_for('static',filename='images/Avatar-15.jpeg')}}" class="cover">
                     </div>
                     <!-- Text -->
                     <div class="h-text">
@@ -955,7 +662,7 @@
                 <div class="block">
                     <!-- Img -->
                     <div class="imgBox">
-                        <img src="images/Avatar-10.jpeg" class="cover">
+                        <img src="{{url_for('static',filename='images/Avatar-10.jpeg')}}" class="cover">
                     </div>
                     <!-- Text -->
                     <div class="h-text">
@@ -970,157 +677,7 @@
                     </div>
                 </div>
 
-                <!-- Chats 11 -->
-                <div class="block">
-                    <!-- Img -->
-                    <div class="imgBox">
-                        <img src="images/Avatar-12.jpg" class="cover">
-                    </div>
-                    <!-- Text -->
-                    <div class="h-text">
-                        <div class="head">
-                            <h4 title="Pricilia" aria-label="Pricilia">Pricilia</h4>
-                        </div>
-                        <div class="message">
-                            <p title="Hey there! I am using WhatsApp." aria-label="Hey there! I am using WhatsApp.">
-                                Hey
-                                there! I am using WhatsApp.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Chats 12 -->
-                <div class="block">
-                    <!-- Img -->
-                    <div class="imgBox">
-                        <img src="images/Avatar-13.jpg" class="cover">
-                    </div>
-                    <!-- Text -->
-                    <div class="h-text">
-                        <div class="head">
-                            <h4 title="Adebisi" aria-label="Adebisi">Adebisi</h4>
-                        </div>
-                        <div class="message">
-                            <p title="Hey there! I am using WhatsApp." aria-label="Hey there! I am using WhatsApp.">
-                                Hey
-                                there! I am using WhatsApp.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Chats 13 -->
-                <div class="block">
-                    <!-- Img -->
-                    <div class="imgBox">
-                        <img src="images/Avatar-14.jpeg" class="cover">
-                    </div>
-                    <!-- Text -->
-                    <div class="h-text">
-                        <div class="head">
-                            <h4 title=" aria-label=">/h4>
-                        </div>
-                        <div class="message">
-                            <p title="Hey there! I am using WhatsApp." aria-label="Hey there! I am using WhatsApp.">
-                                Hey
-                                there! I am using WhatsApp.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Chats 14 -->
-                <div class="block">
-                    <!-- Img -->
-                    <div class="imgBox">
-                        <img src="images/Avatar-17.jpeg" class="cover">
-                    </div>
-                    <!-- Text -->
-                    <div class="h-text">
-                        <div class="head">
-                            <h4 title="Alihu" aria-label="Alihu">Alihu</h4>
-                        </div>
-                        <div class="message">
-                            <p title="Hey there! I am using WhatsApp." aria-label="Hey there! I am using WhatsApp.">
-                                Hey
-                                there! I am using WhatsApp.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Chats 15 -->
-                <div class="block">
-                    <!-- Img -->
-                    <div class="imgBox">
-                        <img src="images/Avatar-1.png" class="cover">
-                    </div>
-                    <!-- Text -->
-                    <div class="h-text">
-                        <div class="head">
-                            <h4 title="Adejoke" aria-label="Adejoke">Adejoke</h4>
-                        </div>
-                        <div class="message">
-                            <p title="Hey there! I am using WhatsApp." aria-label="Hey there! I am using WhatsApp.">
-                                Hey
-                                there! I am using WhatsApp.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Chats 16 -->
-                <div class="block">
-                    <!-- Img -->
-                    <div class="imgBox">
-                        <img src="images/img16.jpg" class="cover">
-                    </div>
-                    <!-- Text -->
-                    <div class="h-text">
-                        <div class="head">
-                            <h4 title="Adunola" aria-label="Adunola">Adunola</h4>
-                        </div>
-                        <div class="message">
-                            <p title="Hey there! I am using WhatsApp." aria-label="Hey there! I am using WhatsApp.">
-                                Hey
-                                there! I am using WhatsApp.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Chats 17 -->
-                <div class="block">
-                    <!-- Img -->
-                    <div class="imgBox">
-                        <img src="images/img17.jpg" class="cover">
-                    </div>
-                    <!-- Text -->
-                    <div class="h-text">
-                        <div class="head">
-                            <h4 title="Akolade" aria-label="Akolade">Akolade</h4>
-                        </div>
-                        <div class="message">
-                            <p title="Hey there! I am using WhatsApp." aria-label="Hey there! I am using WhatsApp.">
-                                Hey
-                                there! I am using WhatsApp.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Chats 18 -->
-                <div class="block">
-                    <!-- Img -->
-                    <div class="imgBox">
-                        <img src="images/img18.jpg" class="cover">
-                    </div>
-                    <!-- Text -->
-                    <div class="h-text">
-                        <div class="head">
-                            <h4 title="Anikaede" aria-label="Anikaede">Anikaede</h4>
-                        </div>
-                        <div class="message">
-                            <p title="Hey there! I am using WhatsApp." aria-label="Hey there! I am using WhatsApp.">
-                                Hey
-                                there! I am using WhatsApp.</p>
-                        </div>
-                    </div>
-                </div>
+                
 
             </div>
         </div>
@@ -1153,7 +710,7 @@
                 <div class="top" onclick="openProfile()">
                     <!-- Img -->
                     <div class="imgBox">
-                        <img src="images/Avatar-10.jpeg" alt="" class="cover">
+                        <img src="{{url_for('static',filename='images/Avatar-10.jpeg')}}" alt="" class="cover">
                     </div>
                     <!-- Text -->
                     <div class="h-text">
@@ -1380,7 +937,7 @@
                 <!-- Profile -->
                 <div class="top">
                     <div class="imgBox">
-                        <img src="images/Avatar-10.jpeg" alt="" class="cover animate__animated animate__fadeIn">
+                        <img src="{{url_for('static',filename='images/Avatar-10.jpeg')}}" alt="" class="cover animate__animated animate__fadeIn">
                         <div class="middle">
                             <div aria-disabled="false" role="button" class="icons-profile" data-tab="2" title="Camera"
                                 aria-label="Camera">
@@ -1917,7 +1474,7 @@
             <div class="chats-default">
                 <!-- Images -->
                 <div class="img-top">
-                    <img src="images/dissapering.png" alt="" class="disappear">
+                    <img src="{{url_for('static',filename='images/dissapering.png')}}" alt="" class="disappear">
                 </div>
 
                 <!-- Chats 1 -->
@@ -2098,7 +1655,7 @@
                 <div class="block top">
                     <!-- Img -->
                     <div class="imgBox">
-                        <img src="images/Avatar-7.jpeg" class="cover">
+                        <img src="{{url_for('static',filename='images/Avatar-7.jpeg')}}" class="cover">
                     </div>
                     <!-- Text -->
                     <div class="h-text">
@@ -2663,487 +2220,7 @@
         </div>
 
 
-        <div class="status animate__animated animate__fadeInLeft" id="status">
-            <!-- Header -->
-
-            <div class="header">
-                <!-- Profile Picture -->
-                <div class="imgText">
-                    <div class="userImg">
-                        <img src="images/Avatar-10.jpeg" alt="" class="cover">
-                    </div>
-                    <h4 title="My Status" aria-label="My Status">My Status<br><span aria-label="No Updates">No
-                            updates</span>
-                    </h4>
-                </div>
-
-            </div>
-            <!-- Chats -->
-            <div class="chats-status">
-                <div class="recent">
-                    <!-- Text -->
-                    <div class="h-text">
-                        <div class="head">
-                            <h4>Recent</h4>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Chats 1 -->
-                <div class="block">
-                    <!-- Img -->
-                    <svg class="circle" width="48" height="48" viewBox="0 0 104 104">
-                        <circle cx="52" cy="52" r="50" fill="none" stroke-linecap="round" class="stroke"
-                            stroke-dashoffset="387.69908169872417"
-                            stroke-dasharray="34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10"
-                            stroke-width="4"></circle>
-                    </svg>
-                    <div class="imgBox">
-                        <img src="images/Avatar-7.jpeg" class="cover">
-                    </div>
-                    <!-- Text -->
-                    <div class="h-text">
-                        <div class="head">
-                            <h4 title="Shayan" aria-label="Shayan">Shayan</h4>
-                        </div>
-                        <div class="message">
-                            <p>today at 5:19 PM</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Chats 2 -->
-                <div class="block">
-                    <!-- Img -->
-                    <svg class="circle" width="48" height="48" viewBox="0 0 104 104">
-                        <circle cx="52" cy="52" r="50" fill="none" stroke-linecap="round" class="stroke"
-                            stroke-dashoffset="387.69908169872417"
-                            stroke-dasharray="94.71975511965978 219.43951023931953" stroke-width="4">
-                        </circle>
-                        <circle cx="52" cy="52" r="50" fill="none" stroke-linecap="round" class="Stroke2"
-                            stroke-dashoffset="282.9793265790644"
-                            stroke-dasharray="94.71975511965978 10 94.71975511965978 114.71975511965977"
-                            stroke-width="4">
-                        </circle>
-                    </svg>
-                    <div class="imgBox">
-                        <img src="images/avatar-3.png" class="cover">
-                    </div>
-                    <!-- Text -->
-                    <div class="h-text">
-                        <div class="head">
-                            <h4 title="Ashlar" aria-label="Ashlar">Ashlar</h4>
-                        </div>
-                        <div class="message">
-                            <p>today at 5:19 PM</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Chats 3 -->
-                <div class="block">
-                    <!-- Img -->
-                    <svg class="circle" width="48" height="48" viewBox="0 0 104 104">
-                        <circle cx="52" cy="52" r="50" fill="none" stroke-linecap="round" class="stroke"
-                            stroke-dashoffset="387.69908169872417"
-                            stroke-dasharray="5.7079632679489665 10 5.7079632679489665 10 5.7079632679489665 10 5.7079632679489665 10 5.7079632679489665 10 5.7079632679489665 10 5.7079632679489665 10 5.7079632679489665 10 5.7079632679489665 10 5.7079632679489665 10 5.7079632679489665 10 5.7079632679489665 10 5.7079632679489665 10 5.7079632679489665 10 5.7079632679489665 10 5.7079632679489665 10 5.7079632679489665 10 5.7079632679489665 10 5.7079632679489665 10 5.7079632679489665 10"
-                            stroke-width="4"></circle>
-                    </svg>
-                    <div class="imgBox">
-                        <img src="images/Avatar-1.png" class="cover">
-                    </div>
-                    <!-- Text -->
-                    <div class="h-text">
-                        <div class="head">
-                            <h4 title="Olivia" aria-label="Olivia">Olivia</h4>
-                        </div>
-                        <div class="message">
-                            <p>today at 5:19 PM</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Chats 4 -->
-                <div class="block">
-                    <!-- Img -->
-                    <svg class="circle" width="48" height="48" viewBox="0 0 104 104">
-                        <circle cx="52" cy="52" r="50" fill="none" stroke-linecap="round" class="stroke"
-                            stroke-width="4">
-                        </circle>
-                    </svg>
-                    <div class="imgBox">
-                        <img src="images/Avatar-2.png" class="cover">
-                    </div>
-                    <!-- Text -->
-                    <div class="h-text">
-                        <div class="head">
-                            <h4 title="Amelia" aria-label="Amelia">Amelia</h4>
-                        </div>
-                        <div class="message">
-                            <p>today at 5:19 PM</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Chats 5 -->
-                <div class="block">
-                    <!-- Img -->
-                    <svg class="circle" width="48" height="48" viewBox="0 0 104 104">
-                        <circle cx="52" cy="52" r="50" fill="none" stroke-linecap="round" class="stroke"
-                            stroke-dashoffset="387.69908169872417"
-                            stroke-dasharray="34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10"
-                            stroke-width="4"></circle>
-                    </svg>
-                    <div class="imgBox">
-                        <img src="images/Avatar-5.jpeg" class="cover">
-                    </div>
-                    <!-- Text -->
-                    <div class="h-text">
-                        <div class="head">
-                            <h4 title="Raoul" aria-label="Raoul">Raoul</h4>
-                        </div>
-                        <div class="message">
-                            <p>today at 5:19 PM</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Chats 6 -->
-                <div class="block">
-                    <!-- Img -->
-                    <svg class="circle" width="48" height="48" viewBox="0 0 104 104">
-                        <circle cx="52" cy="52" r="50" fill="none" stroke-linecap="round" class="stroke"
-                            stroke-dashoffset="387.69908169872417"
-                            stroke-dasharray="34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10"
-                            stroke-width="4"></circle>
-                    </svg>
-                    <div class="imgBox">
-                        <img src="images/Avatar-16.jpeg" class="cover">
-                    </div>
-                    <!-- Text -->
-                    <div class="h-text">
-                        <div class="head">
-                            <h4 title="Joseph" aria-label="Joseph">Joseph</h4>
-                        </div>
-                        <div class="message">
-                            <p>today at 5:19 PM</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Chats 7 -->
-                <div class="block">
-                    <!-- Img -->
-                    <svg class="circle" width="48" height="48" viewBox="0 0 104 104">
-                        <circle cx="52" cy="52" r="50" fill="none" stroke-linecap="round" class="stroke"
-                            stroke-dashoffset="387.69908169872417"
-                            stroke-dasharray="68.53981633974483 10 68.53981633974483 10 68.53981633974483 10 68.53981633974483 10"
-                            stroke-width="4">
-                        </circle>
-                    </svg>
-                    <div class="imgBox">
-                        <img src="images/Avatar-11.jpg" class="cover">
-                    </div>
-                    <!-- Text -->
-                    <div class="h-text">
-                        <div class="head">
-                            <h4 title="Diana" aria-label="Diana">Diana</h4>
-                        </div>
-                        <div class="message">
-                            <p>today at 5:19 PM</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Chats 8 -->
-                <div class="block">
-                    <!-- Img -->
-                    <svg class="circle" width="48" height="48" viewBox="0 0 104 104">
-                        <circle cx="52" cy="52" r="50" fill="none" stroke-linecap="round" class="stroke"
-                            stroke-dashoffset="387.69908169872417"
-                            stroke-dasharray="34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10"
-                            stroke-width="4">
-                        </circle>
-                    </svg>
-                    <div class="imgBox">
-                        <img src="images/avatar-8.jpeg" class="cover">
-                    </div>
-                    <!-- Text -->
-                    <div class="h-text">
-                        <div class="head">
-                            <h4 title="Kabir" aria-label="Kabir">Kabir</h4>
-                        </div>
-                        <div class="message">
-                            <p>today at 5:19 PM</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Chats 9 -->
-                <div class="block">
-                    <!-- Img -->
-                    <svg class="circle" width="48" height="48" viewBox="0 0 104 104">
-                        <circle cx="52" cy="52" r="50" fill="none" stroke-linecap="round" class="stroke"
-                            stroke-dashoffset="387.69908169872417"
-                            stroke-dasharray="34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10"
-                            stroke-width="4"></circle>
-                    </svg>
-                    <div class="imgBox">
-                        <img src="images/Avatar-15.jpeg" class="cover">
-                    </div>
-                    <!-- Text -->
-                    <div class="h-text">
-                        <div class="head">
-                            <h4 title="Grace" aria-label="Grace">Grace</h4>
-                        </div>
-                        <div class="message">
-                            <p>today at 5:19 PM</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Chats 10 -->
-                <div class="block">
-                    <!-- Img -->
-                    <svg class="circle" width="48" height="48" viewBox="0 0 104 104">
-                        <circle cx="52" cy="52" r="50" fill="none" stroke-linecap="round" class="stroke"
-                            stroke-dashoffset="387.69908169872417"
-                            stroke-dasharray="34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10"
-                            stroke-width="4"></circle>
-                    </svg>
-                    <div class="imgBox">
-                        <img src="images/Avatar-10.jpeg" class="cover">
-                    </div>
-                    <!-- Text -->
-                    <div class="h-text">
-                        <div class="head">
-                            <h4 title="Adeboye" aria-label="Adeboye">Adeboye</h4>
-                        </div>
-                        <div class="message">
-                            <p>today at 5:19 PM</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Chats 11 -->
-                <div class="block">
-                    <!-- Img -->
-                    <svg class="circle" width="48" height="48" viewBox="0 0 104 104">
-                        <circle cx="52" cy="52" r="50" fill="none" stroke-linecap="round" class="stroke"
-                            stroke-dashoffset="387.69908169872417"
-                            stroke-dasharray="34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10"
-                            stroke-width="4"></circle>
-                    </svg>
-                    <div class="imgBox">
-                        <img src="images/Avatar-12.jpg" class="cover">
-                    </div>
-                    <!-- Text -->
-                    <div class="h-text">
-                        <div class="head">
-                            <h4 title="Danjuma" aria-label="Danjuma">Danjuma</h4>
-                        </div>
-                        <div class="message">
-                            <p>today at 5:19 PM</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Chats 12 -->
-                <div class="block">
-                    <!-- Img -->
-                    <svg class="circle" width="48" height="48" viewBox="0 0 104 104">
-                        <circle cx="52" cy="52" r="50" fill="none" stroke-linecap="round" class="stroke"
-                            stroke-dashoffset="387.69908169872417"
-                            stroke-dasharray="34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10"
-                            stroke-width="4"></circle>
-                    </svg>
-                    <div class="imgBox">
-                        <img src="images/Avatar-13.jpg" class="cover">
-                    </div>
-                    <!-- Text -->
-                    <div class="h-text">
-                        <div class="head">
-                            <h4 title="Bankole" aria-label="Bankole">Bankole</h4>
-                        </div>
-                        <div class="message">
-                            <p>today at 5:19 PM</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Chats 13 -->
-                <div class="block">
-                    <!-- Img -->
-                    <svg class="circle" width="48" height="48" viewBox="0 0 104 104">
-                        <circle cx="52" cy="52" r="50" fill="none" stroke-linecap="round" class="stroke"
-                            stroke-dashoffset="387.69908169872417"
-                            stroke-dasharray="34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10"
-                            stroke-width="4"></circle>
-                    </svg>
-                    <div class="imgBox">
-                        <img src="images/Avatar-14.jpeg" class="cover">
-                    </div>
-                    <!-- Text -->
-                    <div class="h-text">
-                        <div class="head">
-                            <h4 title="Mutiat" aria-label="Mutiat">Mutiat</h4>
-                        </div>
-                        <div class="message">
-                            <p>today at 5:19 PM</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Chats 14 -->
-                <div class="block">
-                    <!-- Img -->
-                    <svg class="circle" width="48" height="48" viewBox="0 0 104 104">
-                        <circle cx="52" cy="52" r="50" fill="none" stroke-linecap="round" class="stroke"
-                            stroke-dashoffset="387.69908169872417"
-                            stroke-dasharray="34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10"
-                            stroke-width="4"></circle>
-                    </svg>
-                    <div class="imgBox">
-                        <img src="images/Avatar-17.jpeg" class="cover">
-                    </div>
-                    <!-- Text -->
-                    <div class="h-text">
-                        <div class="head">
-                            <h4 title="Alihu" aria-label="Alihu">Alihu</h4>
-                        </div>
-                        <div class="message">
-                            <p>today at 5:19 PM</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Chats 15 -->
-                <div class="block">
-                    <!-- Img -->
-                    <svg class="circle" width="48" height="48" viewBox="0 0 104 104">
-                        <circle cx="52" cy="52" r="50" fill="none" stroke-linecap="round" class="stroke"
-                            stroke-dashoffset="387.69908169872417"
-                            stroke-dasharray="34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10"
-                            stroke-width="4"></circle>
-                    </svg>
-                    <div class="imgBox">
-                        <img src="images/Avatar-1.png" class="cover">
-                    </div>
-                    <!-- Text -->
-                    <div class="h-text">
-                        <div class="head">
-                            <h4 title="Shayan" aria-label="Shayan">Shayan</h4>
-                        </div>
-                        <div class="message">
-                            <p>today at 5:19 PM</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Chats 16 -->
-                <div class="block">
-                    <!-- Img -->
-                    <svg class="circle" width="48" height="48" viewBox="0 0 104 104">
-                        <circle cx="52" cy="52" r="50" fill="none" stroke-linecap="round" class="stroke"
-                            stroke-dashoffset="387.69908169872417"
-                            stroke-dasharray="34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10"
-                            stroke-width="4"></circle>
-                    </svg>
-                    <div class="imgBox">
-                        <img src="images/img16.jpg" class="cover">
-                    </div>
-                    <!-- Text -->
-                    <div class="h-text">
-                        <div class="head">
-                            <h4 title="Shayan" aria-label="Shayan">Shayan</h4>
-                        </div>
-                        <div class="message">
-                            <p>today at 5:19 PM</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Chats 17 -->
-                <div class="block">
-                    <!-- Img -->
-                    <svg class="circle" width="48" height="48" viewBox="0 0 104 104">
-                        <circle cx="52" cy="52" r="50" fill="none" stroke-linecap="round" class="stroke"
-                            stroke-dashoffset="387.69908169872417"
-                            stroke-dasharray="34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10"
-                            stroke-width="4"></circle>
-                    </svg>
-                    <div class="imgBox">
-                        <img src="images/img17.jpg" class="cover">
-                    </div>
-                    <!-- Text -->
-                    <div class="h-text">
-                        <div class="head">
-                            <h4 title="Shayan" aria-label="Shayan">Shayan</h4>
-                        </div>
-                        <div class="message">
-                            <p>today at 5:19 PM</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Chats 18 -->
-                <div class="block">
-                    <!-- Img -->
-                    <svg class="circle" width="48" height="48" viewBox="0 0 104 104">
-                        <circle cx="52" cy="52" r="50" fill="none" stroke-linecap="round" class="stroke"
-                            stroke-dashoffset="387.69908169872417"
-                            stroke-dasharray="34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10 34.87989505128276 10"
-                            stroke-width="4"></circle>
-                    </svg>
-                    <div class="imgBox">
-                        <img src="images/img18.jpg" class="cover">
-                    </div>
-                    <!-- Text -->
-                    <div class="h-text">
-                        <div class="head">
-                            <h4 title="Shayan" aria-label="Shayan">Shayan</h4>
-                        </div>
-                        <div class="message">
-                            <p>today at 5:19 PM</p>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-
-        <div class="rightStatus animate__animated animate__fadeInRight" id="rightStatus">
-            <div class="_shbxn">
-                <div class="_13bjQ">
-                    <div class="status-placeholder">
-                        <span data-testid="status-v3-placeholder" data-icon="status-v3-placeholder" class="">
-                            <svg version="1.1" id="Layer_1" x="0" y="0" viewBox="0 0 80 80" width="80" height="80"
-                                class="">
-                                <path fill="currentColor"
-                                    d="M30.566 78.982c-.222 0-.447-.028-.672-.087C12.587 74.324.5 58.588.5 40.631c0-3.509.459-6.989 1.363-10.343a2.625 2.625 0 0 1 5.068 1.366 34.505 34.505 0 0 0-1.182 8.977c0 15.578 10.48 29.226 25.485 33.188a2.625 2.625 0 0 1-.668 5.163zm19.355-.107C67.336 74.364 79.5 58.611 79.5 40.563c0-3.477-.452-6.933-1.345-10.27a2.624 2.624 0 1 0-5.071 1.356 34.578 34.578 0 0 1 1.166 8.914c0 15.655-10.545 29.319-25.646 33.23a2.625 2.625 0 0 0 1.317 5.082zM15.482 16.5C21.968 9.901 30.628 6.267 39.867 6.267c9.143 0 17.738 3.569 24.202 10.05a2.625 2.625 0 0 0 3.717-3.708C60.329 5.135 50.413 1.018 39.867 1.018c-10.658 0-20.648 4.191-28.128 11.802a2.624 2.624 0 1 0 3.743 3.68z">
-                                </path>
-                            </svg>
-                        </span>
-                    </div>
-                    <div class="status-text">Click on a contact to view their status
-                        updates</div>
-                </div>
-            </div>
-
-            <div class="ICON">
-                <div aria-disabled="true" role="button" tabindex="0" class="icons" data-tab="0" onclick="closeStatus()">
-                    <span data-testid="x-viewer" data-icon="x-viewer" class="">
-                        <svg viewBox="0 0 24 24" width="24" height="24" class="">
-                            <path fill="currentColor"
-                                d="m19.8 5.8-1.6-1.6-6.2 6.2-6.2-6.2-1.6 1.6 6.2 6.2-6.2 6.2 1.6 1.6 6.2-6.2 6.2 6.2 1.6-1.6-6.2-6.2 6.2-6.2z">
-                            </path>
-                        </svg>
-                    </span>
-                </div>
-            </div>
-
-        </div>
+        
 
         <div class="Right-Container" style="flex: 70%; display: flex;overflow: hidden;" id="right">
             <div class="rightSide" style="display: none;" id="rightSide">
@@ -3190,240 +2267,40 @@
                     </div>
                 </div>
 
-                <!-- ChatBox -->
-                <div class="chatBox">
-                    <div>
-                        <div class="chat__date-wrapper"><span class="chat__date"> 04/06/2021</span></div>
-                        <p class="chat__encryption-msg">
-                            <svg width="10px" height="12px" viewBox="0 0 10 12" version="1.1"
-                                xmlns="http://www.w3.org/2000/svg" class="chat__encryption-icon">
-                                <path
-                                    d="M5.00847986,1.6 C6.38255462,1.6 7.50937014,2.67435859 7.5940156,4.02703389 L7.59911976,4.1906399 L7.599,5.462 L7.75719976,5.46214385 C8.34167974,5.46214385 8.81591972,5.94158383 8.81591972,6.53126381 L8.81591972,9.8834238 C8.81591972,10.4731038 8.34167974,10.9525438 7.75719976,10.9525438 L2.25767996,10.9525438 C1.67527998,10.9525438 1.2,10.4731038 1.2,9.8834238 L1.2,6.53126381 C1.2,5.94158383 1.67423998,5.46214385 2.25767996,5.46214385 L2.416,5.462 L2.41679995,4.1906399 C2.41679995,2.81636129 3.49135449,1.68973395 4.84478101,1.60510326 L5.00847986,1.6 Z M5.00847986,2.84799995 C4.31163824,2.84799995 3.73624912,3.38200845 3.6709675,4.06160439 L3.6647999,4.1906399 L3.663,5.462 L6.35,5.462 L6.35111981,4.1906399 C6.35111981,3.53817142 5.88169076,2.99180999 5.26310845,2.87228506 L5.13749818,2.85416626 L5.00847986,2.84799995 Z"
-                                    fill="currentColor"></path>
-                            </svg>
-                            Messages are end-to-end encrypted. No one outside of this chat, not even WhatsApp, can
-                            read or listen to them. Click to learn more.
-                        </p>
-
-                        <p class="chatMessage my-chat">
-                            <span>Hi </span>
-                            <span class="chat__msg-filler"> </span>
-                            <span class="msg-footer">
-                                <span>08:11 AM</span>
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 15" width="16" height="15"
-                                    aria-label="read" class="chat-icon--blue">
-                                    <path fill="currentColor"
-                                        d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L8.666 9.879a.32.32 0 0 1-.484.033l-.358-.325a.319.319 0 0 0-.484.032l-.378.483a.418.418 0 0 0 .036.541l1.32 1.266c.143.14.361.125.484-.033l6.272-8.048a.366.366 0 0 0-.064-.512zm-4.1 0l-.478-.372a.365.365 0 0 0-.51.063L4.566 9.879a.32.32 0 0 1-.484.033L1.891 7.769a.366.366 0 0 0-.515.006l-.423.433a.364.364 0 0 0 .006.514l3.258 3.185c.143.14.361.125.484-.033l6.272-8.048a.365.365 0 0 0-.063-.51z">
-                                    </path>
-                                </svg>
-                            </span>
-                            <button aria-label="Message options" class="chat__msg-options"><svg
-                                    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19 20" width="19" height="20"
-                                    class="chat__msg-options-icon">
-                                    <path fill="currentColor"
-                                        d="M3.8 6.7l5.7 5.7 5.7-5.7 1.6 1.6-7.3 7.2-7.3-7.2 1.6-1.6z">
-                                    </path>
-                                </svg>
-                            </button>
-                        </p>
-
-                        <p class="chatMessage frnd-chat">
-                            <span>Hello</span>
-                            <span class="chat__msg-filler2"> </span>
-                            <span class="msg-footer">
-                                <span>08:20 AM</span>
-                            </span>
-                            <button aria-label="Message options" class="chat__msg-options"><svg
-                                    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19 20" width="19" height="20"
-                                    class="chat__msg-options-icon">
-                                    <path fill="currentColor"
-                                        d="M3.8 6.7l5.7 5.7 5.7-5.7 1.6 1.6-7.3 7.2-7.3-7.2 1.6-1.6z">
-                                    </path>
-                                </svg>
-                            </button>
-                        </p>
-
-                        <p class="chatMessage my-chat">
-                            <span>Hw are you doing </span>
-                            <span class="chat__msg-filler"> </span>
-                            <span class="msg-footer">
-                                <span>09:11 AM</span>
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 15" width="16" height="15"
-                                    aria-label="read" class="chat-icon--blue">
-                                    <path fill="currentColor"
-                                        d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L8.666 9.879a.32.32 0 0 1-.484.033l-.358-.325a.319.319 0 0 0-.484.032l-.378.483a.418.418 0 0 0 .036.541l1.32 1.266c.143.14.361.125.484-.033l6.272-8.048a.366.366 0 0 0-.064-.512zm-4.1 0l-.478-.372a.365.365 0 0 0-.51.063L4.566 9.879a.32.32 0 0 1-.484.033L1.891 7.769a.366.366 0 0 0-.515.006l-.423.433a.364.364 0 0 0 .006.514l3.258 3.185c.143.14.361.125.484-.033l6.272-8.048a.365.365 0 0 0-.063-.51z">
-                                    </path>
-                                </svg>
-                            </span>
-                            <button aria-label="Message options" class="chat__msg-options"><svg
-                                    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19 20" width="19" height="20"
-                                    class="chat__msg-options-icon">
-                                    <path fill="currentColor"
-                                        d="M3.8 6.7l5.7 5.7 5.7-5.7 1.6 1.6-7.3 7.2-7.3-7.2 1.6-1.6z">
-                                    </path>
-                                </svg>
-                            </button>
-                        </p>
-
-                        <p class="chatMessage frnd-chat">
-                            <span>am fine</span>
-                            <span class="chat__msg-filler2"> </span>
-                            <span class="msg-footer">
-                                <span>09:30 AM</span>
-                            </span>
-                            <button aria-label="Message options" class="chat__msg-options"><svg
-                                    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19 20" width="19" height="20"
-                                    class="chat__msg-options-icon">
-                                    <path fill="currentColor"
-                                        d="M3.8 6.7l5.7 5.7 5.7-5.7 1.6 1.6-7.3 7.2-7.3-7.2 1.6-1.6z">
-                                    </path>
-                                </svg>
-                            </button>
-                        </p>
-                    </div>
-                    <div>
-                        <div class="chat__date-wrapper"><span class="chat__date"> YESTERDAY</span></div>
-
-                        <p class="chatMessage my-chat">
-                            <span>ok wat about your siblings </span>
-                            <span class="chat__msg-filler"> </span>
-                            <span class="msg-footer">
-                                <span>10:23 AM</span>
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 15" width="16" height="15"
-                                    aria-label="read" class="chat-icon--blue">
-                                    <path fill="currentColor"
-                                        d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L8.666 9.879a.32.32 0 0 1-.484.033l-.358-.325a.319.319 0 0 0-.484.032l-.378.483a.418.418 0 0 0 .036.541l1.32 1.266c.143.14.361.125.484-.033l6.272-8.048a.366.366 0 0 0-.064-.512zm-4.1 0l-.478-.372a.365.365 0 0 0-.51.063L4.566 9.879a.32.32 0 0 1-.484.033L1.891 7.769a.366.366 0 0 0-.515.006l-.423.433a.364.364 0 0 0 .006.514l3.258 3.185c.143.14.361.125.484-.033l6.272-8.048a.365.365 0 0 0-.063-.51z">
-                                    </path>
-                                </svg>
-                            </span>
-                            <button aria-label="Message options" class="chat__msg-options"><svg
-                                    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19 20" width="19" height="20"
-                                    class="chat__msg-options-icon">
-                                    <path fill="currentColor"
-                                        d="M3.8 6.7l5.7 5.7 5.7-5.7 1.6 1.6-7.3 7.2-7.3-7.2 1.6-1.6z">
-                                    </path>
-                                </svg>
-                            </button>
-                        </p>
-
-                        <p class="chatMessage frnd-chat">
-                            <span>they are fine and yours</span>
-                            <span class="chat__msg-filler2"> </span>
-                            <span class="msg-footer">
-                                <span>11:00 AM</span>
-                            </span>
-                            <button aria-label="Message options" class="chat__msg-options"><svg
-                                    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19 20" width="19" height="20"
-                                    class="chat__msg-options-icon">
-                                    <path fill="currentColor"
-                                        d="M3.8 6.7l5.7 5.7 5.7-5.7 1.6 1.6-7.3 7.2-7.3-7.2 1.6-1.6z">
-                                    </path>
-                                </svg>
-                            </button>
-                        </p>
-
-                        <p class="chatMessage my-chat">
-                            <span>fine</span>
-                            <span class="chat__msg-filler"> </span>
-                            <span class="msg-footer">
-                                <span>12:10 PM</span>
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 15" width="16" height="15"
-                                    aria-label="read" class="chat-icon--blue">
-                                    <path fill="currentColor"
-                                        d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L8.666 9.879a.32.32 0 0 1-.484.033l-.358-.325a.319.319 0 0 0-.484.032l-.378.483a.418.418 0 0 0 .036.541l1.32 1.266c.143.14.361.125.484-.033l6.272-8.048a.366.366 0 0 0-.064-.512zm-4.1 0l-.478-.372a.365.365 0 0 0-.51.063L4.566 9.879a.32.32 0 0 1-.484.033L1.891 7.769a.366.366 0 0 0-.515.006l-.423.433a.364.364 0 0 0 .006.514l3.258 3.185c.143.14.361.125.484-.033l6.272-8.048a.365.365 0 0 0-.063-.51z">
-                                    </path>
-                                </svg>
-                            </span>
-                            <button aria-label="Message options" class="chat__msg-options"><svg
-                                    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19 20" width="19" height="20"
-                                    class="chat__msg-options-icon">
-                                    <path fill="currentColor"
-                                        d="M3.8 6.7l5.7 5.7 5.7-5.7 1.6 1.6-7.3 7.2-7.3-7.2 1.6-1.6z">
-                                    </path>
-                                </svg>
-                            </button>
-                        </p>
-                    </div>
-                    <div>
-                        <div class="chat__date-wrapper"><span class="chat__date"> TODAY</span></div>
-
-                        <p class="chatMessage frnd-chat">
-                            <span>alright</span>
-                            <span class="chat__msg-filler2"> </span>
-                            <span class="msg-footer">
-                                <span>12:44 AM</span>
-                            </span>
-                            <button aria-label="Message options" class="chat__msg-options"><svg
-                                    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19 20" width="19" height="20"
-                                    class="chat__msg-options-icon">
-                                    <path fill="currentColor"
-                                        d="M3.8 6.7l5.7 5.7 5.7-5.7 1.6 1.6-7.3 7.2-7.3-7.2 1.6-1.6z">
-                                    </path>
-                                </svg>
-                            </button>
-                        </p>
-
-                        <p class="chatMessage my-chat">
-                            <span>i need your help with 500# airtime Glo</span>
-                            <span class="chat__msg-filler"> </span>
-                            <span class="msg-footer">
-                                <span>12:44 AM</span>
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 15" width="16" height="15"
-                                    aria-label="read" class="chat-icon--blue">
-                                    <path fill="currentColor"
-                                        d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L8.666 9.879a.32.32 0 0 1-.484.033l-.358-.325a.319.319 0 0 0-.484.032l-.378.483a.418.418 0 0 0 .036.541l1.32 1.266c.143.14.361.125.484-.033l6.272-8.048a.366.366 0 0 0-.064-.512zm-4.1 0l-.478-.372a.365.365 0 0 0-.51.063L4.566 9.879a.32.32 0 0 1-.484.033L1.891 7.769a.366.366 0 0 0-.515.006l-.423.433a.364.364 0 0 0 .006.514l3.258 3.185c.143.14.361.125.484-.033l6.272-8.048a.365.365 0 0 0-.063-.51z">
-                                    </path>
-                                </svg>
-                            </span>
-                            <button aria-label="Message options" class="chat__msg-options"><svg
-                                    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19 20" width="19" height="20"
-                                    class="chat__msg-options-icon">
-                                    <path fill="currentColor"
-                                        d="M3.8 6.7l5.7 5.7 5.7-5.7 1.6 1.6-7.3 7.2-7.3-7.2 1.6-1.6z">
-                                    </path>
-                                </svg>
-                            </button>
-                        </p>
-
-                        <p class="chatMessage frnd-chat">
-                            <span>ok, here 6281 9747 3917 3922</span>
-                            <span class="chat__msg-filler2"> </span>
-                            <span class="msg-footer">
-                                <span>12:44 AM</span>
-                            </span>
-                            <button aria-label="Message options" class="chat__msg-options"><svg
-                                    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19 20" width="19" height="20"
-                                    class="chat__msg-options-icon">
-                                    <path fill="currentColor"
-                                        d="M3.8 6.7l5.7 5.7 5.7-5.7 1.6 1.6-7.3 7.2-7.3-7.2 1.6-1.6z">
-                                    </path>
-                                </svg>
-                            </button>
-                        </p>
-
-                        <p class="chatMessage my-chat">
-                            <span>ok thanks for your help i really appreciate</span>
-                            <span class="chat__msg-filler"> </span>
-                            <span class="msg-footer">
-                                <span>12:44 AM</span>
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 15" width="16" height="15"
-                                    aria-label="read" class="chat-icon--text">
-                                    <path fill="currentColor"
-                                        d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L8.666 9.879a.32.32 0 0 1-.484.033l-.358-.325a.319.319 0 0 0-.484.032l-.378.483a.418.418 0 0 0 .036.541l1.32 1.266c.143.14.361.125.484-.033l6.272-8.048a.366.366 0 0 0-.064-.512zm-4.1 0l-.478-.372a.365.365 0 0 0-.51.063L4.566 9.879a.32.32 0 0 1-.484.033L1.891 7.769a.366.366 0 0 0-.515.006l-.423.433a.364.364 0 0 0 .006.514l3.258 3.185c.143.14.361.125.484-.033l6.272-8.048a.365.365 0 0 0-.063-.51z">
-                                    </path>
-                                </svg>
-                            </span>
-                            <button aria-label="Message options" class="chat__msg-options"><svg
-                                    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19 20" width="19" height="20"
-                                    class="chat__msg-options-icon">
-                                    <path fill="currentColor"
-                                        d="M3.8 6.7l5.7 5.7 5.7-5.7 1.6 1.6-7.3 7.2-7.3-7.2 1.6-1.6z">
-                                    </path>
-                                </svg>
-                            </button>
-                        </p>
-                    </div>
+                <div class="chatBox" id="chatBox">
+                    <!-- Chat messages will be injected here -->
                 </div>
+
+                <script type="text/javascript">
+                    function openChat(userId) {
+                        fetch(`/chat/${userId}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                const chatBox = document.getElementById('chatBox');
+                                chatBox.innerHTML = ''; // Clear the chat box
+                
+                                data.messages.forEach(msg => {
+                                    const messageElement = document.createElement('p');
+                                    messageElement.className = `chatMessage ${msg.sender === 'me' ? 'my-chat' : 'frnd-chat'}`;
+                
+                                    messageElement.innerHTML = `
+                                        <span>${msg.content}</span>
+                                        <span class="chat__msg-filler"></span>
+                                        <span class="msg-footer">
+                                            <span>${msg.timestamp}</span>
+                                            ${msg.sender === 'me' ? 
+                                                `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 15" width="16" height="15" aria-label="read" class="chat-icon--blue">
+                                                    <path fill="currentColor"
+                                                        d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L8.666 9.879a.32.32 0 0 1-.484.033l-.358-.325a.319.319 0 0 0-.484.032l-.378.483a.418.418 0 0 0 .036.541l1.32 1.266c.143.14.361.125.484-.033l6.272-8.048a.366.366 0 0 0-.064-.512zm-4.1 0l-.478-.372a.365.365 0 0 0-.51.063L4.566 9.879a.32.32 0 0 1-.484.033L1.891 7.769a.366.366 0 0 0-.515.006l-.423.433a.364.364 0 0 0 .006.514l3.258 3.185c.143.14.361.125.484-.033l6.272-8.048a.365.365 0 0 0-.063-.51z"></path>
+                                                </svg>` : ''}
+                                        </span>
+                                    `;
+                                    chatBox.appendChild(messageElement);
+                                });
+                            })
+                            .catch(error => console.error('Error:', error));
+                    }
+                </script>
 
                 <div class="chat-footer">
                     <div class="emojis__wrapper" id="emoji-wrap">
