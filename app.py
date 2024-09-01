@@ -9,6 +9,9 @@ from authlib.integrations.flask_client import OAuth
 
 from datetime import datetime
 
+from flask import json
+from werkzeug.exceptions import HTTPException
+
 from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -30,7 +33,8 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 # Flask Login Stuff
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = 'login'
+
+app.config['LOGIN_VIEW'] = 'login'
 
 oauth = OAuth(app)
 
@@ -109,8 +113,8 @@ class Groups(db.Model):
     messages = db.relationship('Message', backref='group2', lazy=True)
 
 @login_manager.user_loader
-def load_user(id):
-	return Users.query.get(int(id))
+def load_user(user_id):
+    return Users.query.get(int(user_id))
 
 @app.route('/login/google')
 def login_google():
@@ -159,6 +163,8 @@ def login():
                     login_user(user)
                     flash("Login Success")
                     id = Users.query.filter_by(username=loginform.username.data).first()
+                    session["name"] = loginform.username.data
+                    session["id"] = id.id
                     return redirect(url_for('home',id=id.id))
                 else:
                     flash("Wrong Credentials - Try Again!")
@@ -186,6 +192,7 @@ def register():
         login_user(new_user)
         id = Users.query.filter_by(username=username).first()
         session["name"] = username
+        session["id"] = id.id
         return redirect(url_for('home', id=id.id))
     return render_template('login.html', signupform=signupform, loginform=loginform)
 
@@ -202,9 +209,11 @@ def get_chat(user_id):
 
 
 @app.route("/", methods=["GET", "POST"])
+@app.route("/home", methods=["GET", "POST"])
 @app.route("/home/<int:id>", methods=["GET","POST"])
+
 @login_required
-def home(id):
+def home(id=None):
     # Load all users and their last message from the database
     # users = Users.query.all()
     # chats1 = []
@@ -215,10 +224,25 @@ def home(id):
     #         'user': "Name",
     #         'last_message': "Message"
     #     })
+
+    if id is None:
+        print("Hello WOrld")
+        # Handle the case where no ID is provided (e.g., use current user's ID)
+        try:
+            if id in session["id"]:
+                id = current_user.id
+            else:
+                return redirect(url_for('login'))
+        except:
+            return redirect(url_for('login'))
+
+
+    
     groups = Groups.query.filter_by(user_id=id)
     messages = Groups.query.filter_by(user_id=id)
     
     return render_template("index.html",groups=groups,messages=messages)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
