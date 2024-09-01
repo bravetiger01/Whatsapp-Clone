@@ -125,7 +125,8 @@
             <!-- Chats Box -->
             <div class="chats">
                 <!-- Chats 1 -->
-                <div class="block chat-list" onclick="openChat({{ chat.user.id }})">
+                
+                <div class="block chat-list">
                     <!-- Img -->
                     <div class="imgBox">
                         <img src="{{url_for('static',filename='images/Avatar-7.jpeg')}}" class="cover">
@@ -162,21 +163,22 @@
                     </div>
                 </div>
 
-                {% for chat in chats %}
-                <div class="block chat-list" onclick="openChat({{ chat.user.id }})">
+                {% for group in groups %}
+                <div class="block chat-list" onclick="openChat({{ groups.user.id }})">
                     <!-- Img -->
                     <div class="imgBox">
-                        <img src="{{ url_for('static', filename='images/' + chat.user.avatar) }}" class="cover">
+                        <img src="{{ url_for('static', filename='images/' + 'messages.user.avatar') }}" class="cover">
                     </div>
                     <!-- Text -->
                     <div class="h-text">
                         <div class="head">
-                            <h4 title="{{ chat.user.name }}" aria-label="{{ chat.user.name }}">{{ chat.user.name }}</h4>
+                            <h4 title="{{ messages.user.name }}" aria-label="{{ 'messages.user.name' }}">{{ 'messages.user.name' }}</h4>
                             <p class="time">{{ chat.last_message.timestamp.strftime('%I:%M %p') if chat.last_message else '' }}</p>
                         </div>
                         <div class="message-chat">
                             <div class="chat-text-icon">
-                                <span class="thanks">{{ chat.last_message.content if chat.last_message else 'No messages yet' }}</span>
+                                <!-- <span class="thanks">{{ 'group.last_message.content' if chat.last_message else 'No messages yet' }}</span> -->
+                                <span class="thanks">{{ 'group.last_message.content' }}</span>
                             </div>
                         </div>
                     </div>
@@ -3409,6 +3411,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{url_for('static',filename='js/app.js')}}"></script>
+    <!-- Option 1: Bootstrap Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 </body>
 
 </html>
