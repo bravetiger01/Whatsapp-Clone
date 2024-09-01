@@ -161,16 +161,25 @@ def login():
                 # Check the hash
                 if check_password_hash(user.password_hash, loginform.password.data):
                     login_user(user)
-                    flash("Login Success")
                     id = Users.query.filter_by(username=loginform.username.data).first()
                     session["name"] = loginform.username.data
                     session["id"] = id.id
                     return redirect(url_for('home',id=id.id))
                 else:
-                    flash("Wrong Credentials - Try Again!")
+                    flash("Wrong Credentials - Try Again!", "danger")
             else:
-                flash("User Does Not Exist!")
+                flash("User Does Not Exist!", "danger")
         return render_template('login.html', loginform=loginform, signupform=signupform)
+
+# Logout Page
+@app.route('/logout/<int:id>')
+@login_required
+def logout(id):
+    print("Hello World")
+    user = Users.query.filter_by(id=id).first()
+    logout_user()
+    flash("You Have Been Logged Out!")
+    return redirect(url_for('login'))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -211,7 +220,6 @@ def get_chat(user_id):
 @app.route("/", methods=["GET", "POST"])
 @app.route("/home", methods=["GET", "POST"])
 @app.route("/home/<int:id>", methods=["GET","POST"])
-
 @login_required
 def home(id=None):
     # Load all users and their last message from the database
@@ -234,6 +242,7 @@ def home(id=None):
             else:
                 return redirect(url_for('login'))
         except:
+            flash("You need to be logged in first!")
             return redirect(url_for('login'))
 
 
@@ -241,7 +250,7 @@ def home(id=None):
     groups = Groups.query.filter_by(user_id=id)
     messages = Groups.query.filter_by(user_id=id)
     
-    return render_template("index.html",groups=groups,messages=messages)
+    return render_template("index.html",groups=groups,messages=messages,id=id)
 
 
 if __name__ == '__main__':
