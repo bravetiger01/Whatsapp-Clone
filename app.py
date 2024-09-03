@@ -4,13 +4,11 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import jsonify
 
 from flask_login import UserMixin, login_user, LoginManager,login_required, logout_user, current_user
-from webforms import LoginForm,RegistrationForm
+from webforms import LoginForm,RegistrationForm,GroupForm
 from authlib.integrations.flask_client import OAuth
 
 from datetime import datetime
 
-from flask import json
-from werkzeug.exceptions import HTTPException
 
 from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -105,10 +103,11 @@ class Message(db.Model):
     group = db.relationship('Groups', backref='messages1')
 
 class Groups(db.Model):
-    id = db.Column(db.String(4), primary_key=True)
-    name = db.Column(db.String(200), nullable=False)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(200), nullable=False,unique=True)
     user_id = db.Column(db.String(200), nullable=False)
-    messages = db.Column(db.String(10000), db.ForeignKey('message.content'),nullable=True)
+    description = db.Column(db.Text, nullable=True)
+    messages = db.Column(db.Text, db.ForeignKey('message.content'),nullable=True)
 
     messages = db.relationship('Message', backref='group2', lazy=True)
 
@@ -204,6 +203,25 @@ def register():
         session["id"] = id.id
         return redirect(url_for('home', id=id.id))
     return render_template('login.html', signupform=signupform, loginform=loginform)
+
+@app.route("/addGroup/<int:id>", methods=["GET","POST"])
+@login_required
+def addGroup(id):
+    form = GroupForm()
+    if form.validate_on_submit():
+        print("Hello")
+        name = form.name.data
+        description = form.description.data
+        new_group = Groups(name=name, description=description,user_id=id)
+        groups=Groups.query.filter_by(user_id=id)
+        db.session.add(new_group)
+        db.session.commit()
+        return redirect(url_for('home', id=id))
+
+    return render_template("add_group.html",groupform=form,id=id)
+
+
+
 
 @app.route("/chat/<int:user_id>")
 def get_chat(user_id):

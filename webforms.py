@@ -28,3 +28,8 @@ class RegistrationForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Register')
+
+class GroupForm(FlaskForm):
+	name = StringField('Group Name', validators=[DataRequired()])
+	description = TextAreaField('Group Description', validators=[DataRequired()])
+	submit = SubmitField('Submit')

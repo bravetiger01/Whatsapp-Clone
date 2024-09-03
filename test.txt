@@ -1,0 +1,13 @@
+CHat Head:-
+<div class="h-text">
+    <div class="head">
+        <h4 title="{{ messages.user.name }}" aria-label="{{ 'messages.user.name' }}">{{ 'messages.user.name' }}</h4>
+        <p class="time">{{ chat.last_message.timestamp.strftime('%I:%M %p') if chat.last_message else '' }}</p>
+    </div>
+    <div class="message-chat">
+        <div class="chat-text-icon">
+        <!-- <span class="thanks">{{ 'group.last_message.content' if chat.last_message else 'No messages yet' }}</span> -->
+        <span class="thanks">{{ 'group.last_message.content' }}</span>
+        </div>
+    </div>
+</div>
