@@ -4,16 +4,18 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import jsonify
 
 from flask_login import UserMixin, login_user, LoginManager,login_required, logout_user, current_user
-from webforms import LoginForm,RegistrationForm,GroupForm
+from webforms import LoginForm,RegistrationForm,GroupForm,JoinForm
 from authlib.integrations.flask_client import OAuth
 
 from datetime import datetime
-
+from string import ascii_uppercase
 
 from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from api_key import GITHUB_CLIENT_ID,GITHUB_CLIENT_SECRET,CLIENT_ID,CLIENT_SECRET
+
+import random
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'mysecretkey'
@@ -105,11 +107,24 @@ class Message(db.Model):
 class Groups(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(200), nullable=False,unique=True)
+    code = db.Column(db.String(4), nullable=False,unique=True)
     user_id = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text, nullable=True)
     messages = db.Column(db.Text, db.ForeignKey('message.content'),nullable=True)
 
     messages = db.relationship('Message', backref='group2', lazy=True)
+
+def generate_unique_code(length):
+    """
+    its required for unique codes for create a room
+    """
+    while True:
+        code = ""
+        code = ''.join(random.choice(ascii_uppercase) for _ in range(length))
+        if not Groups.query.filter_by(code=code).first():  # Check if room code exists in the database
+            break
+    
+    return code
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -160,10 +175,10 @@ def login():
                 # Check the hash
                 if check_password_hash(user.password_hash, loginform.password.data):
                     login_user(user)
-                    id = Users.query.filter_by(username=loginform.username.data).first()
+                    user = Users.query.filter_by(username=loginform.username.data).first()
                     session["name"] = loginform.username.data
-                    session["id"] = id.id
-                    return redirect(url_for('home',id=id.id))
+                    session["id"] = user.id
+                    return redirect(url_for('home',username=user.username))
                 else:
                     flash("Wrong Credentials - Try Again!", "danger")
             else:
@@ -204,22 +219,48 @@ def register():
         return redirect(url_for('home', id=id.id))
     return render_template('login.html', signupform=signupform, loginform=loginform)
 
-@app.route("/addGroup/<int:id>", methods=["GET","POST"])
+@app.route("/addGroup/<username>", methods=["GET","POST"])
 @login_required
-def addGroup(id):
+def addGroup(username):
     form = GroupForm()
+    user = Users.query.filter_by(username=username).first()
     if form.validate_on_submit():
         print("Hello")
         name = form.name.data
         description = form.description.data
-        new_group = Groups(name=name, description=description,user_id=id)
-        groups=Groups.query.filter_by(user_id=id)
+        code = generate_unique_code(4)
+        new_group = Groups(name=name, description=description,user_id=user.id,code=code)
+        groups=Groups.query.filter_by(user_id=user.id)
         db.session.add(new_group)
         db.session.commit()
-        return redirect(url_for('home', id=id))
+        return redirect(url_for('home', username=username))
 
-    return render_template("add_group.html",groupform=form,id=id)
+    return render_template("add_group.html",groupform=form,user=user)
 
+
+@app.route("/joinGroup/<username>", methods=["GET","POST"])
+@login_required
+def joinGroup(username):
+    form = JoinForm()
+    user = Users.query.filter_by(username=username).first()
+    if form.validate_on_submit():
+        code = form.code.data
+        code1 = Groups.query.filter_by(code=code).first()
+        print(code1)
+            
+        user = Users.query.filter_by(name=username).first()
+        print(user)
+        if code1:
+            print("Hello World")
+            session["room"] = code
+            session["name"] = username
+                
+                
+            return redirect(url_for("home", username=username))
+        else:
+            flash("Room not found.")
+            return render_template("join_group.html",username=user.username)
+    return render_template("join_group.html",joinform=form,user=user)
 
 
 
@@ -236,10 +277,9 @@ def get_chat(user_id):
 
 
 @app.route("/", methods=["GET", "POST"])
-@app.route("/home", methods=["GET", "POST"])
-@app.route("/home/<int:id>", methods=["GET","POST"])
+@app.route("/home/<username>", methods=["GET","POST"])
 @login_required
-def home(id=None):
+def home(username):
     # Load all users and their last message from the database
     # users = Users.query.all()
     # chats1 = []
@@ -251,12 +291,12 @@ def home(id=None):
     #         'last_message': "Message"
     #     })
 
-    if id is None:
+    if username is None:
         print("Hello WOrld")
         # Handle the case where no ID is provided (e.g., use current user's ID)
         try:
-            if id in session["id"]:
-                id = current_user.id
+            if username in session["username"]:
+                username = current_user.username
             else:
                 return redirect(url_for('login'))
         except:
@@ -265,10 +305,11 @@ def home(id=None):
 
 
     
-    groups = Groups.query.filter_by(user_id=id)
-    messages = Groups.query.filter_by(user_id=id)
+    user = Users.query.filter_by(username=username).first()
+    groups = Groups.query.filter_by(user_id=user.id)
+    messages = Groups.query.filter_by(user_id=user.id)
     
-    return render_template("index.html",groups=groups,messages=messages,id=id)
+    return render_template("index.html",groups=groups,messages=messages,user=user)
 
 
 if __name__ == '__main__':

@@ -63,7 +63,8 @@
 
                 <!-- Dropdown -->
                 <ul class="dropLeft" id="dropLeft">
-                    <li class="listItem" role="button"><a style="text-decoration: none;color:whitesmoke;" href="{{url_for('addGroup', id=id)}}">New group</a></li>
+                    <li class="listItem" role="button"><a style="text-decoration: none;color:whitesmoke;" href="{{url_for('addGroup', username=user.username)}}">New group</a></li>
+                    <li class="listItem" role="button"><a style="text-decoration: none;color:whitesmoke;" href="{{url_for('joinGroup', username=user.username)}}">Join group</a></li>
                     <li class="listItem" role="button" data-bs-toggle="modal" data-bs-target="#exampleModalSec">Log out
                     </li>
                 </ul>
@@ -1078,7 +1079,7 @@
 
                     <div class="m-btn">
                         <button type="button" class="btn1" data-bs-dismiss="modal">Cancel</button>
-                        <a style="text-decoration: none;" type="button" href="{{ url_for('logout', id=id) }}" class="btn2">Logout</a>
+                        <a style="text-decoration: none;" type="button" href="{{ url_for('logout', id=user.id) }}" class="btn2">Logout</a>
                     </div>
                 </div>
             </div>

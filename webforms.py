@@ -33,3 +33,7 @@ class GroupForm(FlaskForm):
 	name = StringField('Group Name', validators=[DataRequired()])
 	description = TextAreaField('Group Description', validators=[DataRequired()])
 	submit = SubmitField('Submit')
+
+class JoinForm(FlaskForm):
+	code = StringField('Group Code', validators=[DataRequired()])
+	submit = SubmitField('Join')

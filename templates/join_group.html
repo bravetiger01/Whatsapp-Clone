@@ -15,12 +15,11 @@
 
 <body>
     <div class="container" id="container">
-        <form method="POST"  action="{{ url_for('addGroup', username=user.username) }}"">
-            {{ groupform.hidden_tag() }}
-            <h1>Create Group</h1>
-            {{ groupform.name(placeholder="Name") }}
-            {{ groupform.description(class="form-control", placeholder="Description") }}
-            {{ groupform.submit(id='button3', value="Add Group") }}
+        <form method="POST"  action="{{ url_for('joinGroup', username=user.username) }}"">
+            {{ joinform.hidden_tag() }}
+            <h1>Join Group</h1>
+            {{ joinform.code(placeholder="Code") }}
+            {{ joinform.submit(id='button3', value="Join Group") }}
         </form>
         
     </div>
