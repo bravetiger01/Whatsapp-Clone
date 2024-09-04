@@ -162,7 +162,7 @@
                 <!-- </div> -->
 
                 {% for group in groups %}
-                <div class="block chat-list" onclick="openRightSide('{{group.name}}','{{group.code}}')">
+                <div class="block chat-list" onclick="openRightSide('{{group.name}}','{{group.code}}','{{id}}')">
                     <!-- Img -->
                     <div class="imgBox">
                         <img src="{{ url_for('static', filename='images/Avatar-10.jpeg') }}" class="cover">
@@ -170,7 +170,8 @@
                     <!-- Text -->
                     <div class="h-text">
                         <div class="head">
-                            <h4 title="Hello" aria-label="Name">{{group.name}}</h4>
+                            <h4 id="Group Name" title="Group Name" aria-label="Name">{{group.name}}</h4>
+                            <p id="user_id" value="{{ id }}">{{id}}</p>
                             <p class="time">IDK</p>
                         </div>
                         <div class="message-chat">
@@ -1797,6 +1798,7 @@
                         </div>
 
                         <input type="text" placeholder="Type a message" id="messages" class="send-message">
+                        
 
                         <button role="button" class="icons">
                             <span class="">

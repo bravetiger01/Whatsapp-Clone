@@ -19,6 +19,7 @@ from werkzeug.utils import secure_filename
 from api_key import GITHUB_CLIENT_ID,GITHUB_CLIENT_SECRET,CLIENT_ID,CLIENT_SECRET
 
 import random
+import time
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'mysecretkey'
@@ -116,7 +117,7 @@ class Users(db.Model, UserMixin):
         return '<Name %r>' % self.name
 
 class Message(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     group_id = db.Column(db.Integer, db.ForeignKey('groups.id'), nullable=False)
     content = db.Column(db.Text, nullable=False)
@@ -283,17 +284,6 @@ def joinGroup(username):
 
 
 
-@app.route("/chat/<int:user_id>")
-def get_chat(user_id):
-    messages = Message.query.filter_by(user_id=user_id).order_by(Message.timestamp).all()
-    message_data = [{
-        'content': message.content,
-        'timestamp': message.timestamp.strftime('%I:%M %p'),
-        'sender': 'me' if message.user_id == session.get('user_id') else 'them'
-    } for message in messages]
-
-    return jsonify({'messages': message_data})
-
 
 @app.route("/", methods=["GET", "POST"])
 @app.route("/home/<username>", methods=["GET","POST"])
@@ -332,7 +322,7 @@ def home(username):
         print(group.name)
     messages = Message.query.filter_by(user_id=user.id).all()
     
-    return render_template("index.html",groups=groups,messages=messages,user=user)
+    return render_template("index.html",groups=groups,messages=messages,user=user,id=user.id)
 
 @app.route("/upload_file", methods=["POST","GET"])
 def upload_file():
@@ -359,28 +349,36 @@ def uploaded_file(filename):
 
 @socketio.on("message") 
 def message(data):
-    room = session.get("room")
-    rooms = db.session.query(Users.room).distinct().all()
-    print(rooms)
-    rooms1 = []
-    for i in rooms:
-        for j in i:
-            rooms1.append(j)
-    if room not in rooms1:
-        return 
+    # group = session.get("room")
+    # rooms = db.session.query(Users.room).distinct().all()
+    # print(rooms)
+    # rooms1 = []
+    # for i in rooms:
+    #     for j in i:
+    #         rooms1.append(j)
+    # if room not in rooms1:
+    #     return
+
+    # print(data)
+    # print(data['group_name'])
+    group = Groups.query.filter_by(name=data['group_name']).first()
+    print(group)
+    if group:
+        new_message = Message(user_id=data['sender_id'],group_id=group.id,content=data['data'],timestamp=datetime.now())  # Create a new message instance
+        # Save message to the database
+        db.session.add(new_message)  # Add the message to the session
+        db.session.commit()  # Commit the session to save the message
+        print("Sent!")
+        
     
-    content = {
-        "name": session.get("name"),
-        "message": data["data"]
-    }
+    # content = {
+    #     "name": session.get("name"),
+    #     "message": data["data"]
+    # }
 
-    # Save message to the database
-    new_message = Message(room=room, name=session.get("name"), content=data["data"])  # Create a new message instance
-    db.session.add(new_message)  # Add the message to the session
-    db.session.commit()  # Commit the session to save the message
 
-    send(content, to=room)
-    print(f"{session.get('name')} said: {data['data']}")
+    # send(content, to=room)
+    # print(f"{session.get('name')} said: {data['data']}")
 
 ## Create Custom Error Pages
 # Invalid URL

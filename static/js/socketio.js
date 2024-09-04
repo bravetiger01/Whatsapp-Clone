@@ -7,66 +7,113 @@ var input = document.getElementById("messages");
 
 // Execute a function when the user presses a key on the keyboard
 input.addEventListener("keypress", function(event) {
-  // If the user presses the "Enter" key on the keyboard
-  if (event.key === "Enter") {
+// If the user presses the "Enter" key on the keyboard
+if (event.key === "Enter") {
     // Cancel the default action, if needed
     console.log("Sent!")
     event.preventDefault();
-    sendMessage()
-  }
+    group = document.getElementById("Group Name").innerHTML
+    user_id = document.getElementById("user_id").innerHTML
+    console.log(group,user_id)
+    sendMessage(group,user_id)
+}
 });
-
+// Send text message
+const sendMessage = (group,user_id) => {
+    const message = document.getElementById("messages");
+    if (message.value == "") return;
+    console.log("Sending message:", message.value);
+    socketio.emit("message", {data: message.value, group_name:group,sender_id:user_id});
+    createMessage(content=message.value,sender_id=user_id)
+    message.value = "";
+};
 
 
 // Function to create and append a message element
-const createMessage = (name, msg, isFile = false) => {
-    let content;
-    if (isFile) {
+const createMessage = (content,sender_id) =>{
+
+
+    const chatBox = document.getElementById('chatBox');
+    chatBox.innerHTML = ''; // Clear the chat box
+    
+    console.log(content)
         content = `
-        <div class="text">
-            <span>
-                <strong>${name}</strong>: <a href="${msg}" target="_blank">File</a>
-            </span>
-            <span class="muted">
-                ${new Date().toLocaleString()}
-            </span>
+        <div>
+            <p class="chatMessage my-chat">
+                <span>Hello </span>
+                <span class="chat__msg-filler"> </span>
+                <span class="msg-footer">
+                    <span>Hello2</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 15" width="16" height="15"
+                        aria-label="read" class="chat-icon--blue">
+                        <path fill="currentColor"
+                            d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L8.666 9.879a.32.32 0 0 1-.484.033l-.358-.325a.319.319 0 0 0-.484.032l-.378.483a.418.418 0 0 0 .036.541l1.32 1.266c.143.14.361.125.484-.033l6.272-8.048a.366.366 0 0 0-.064-.512zm-4.1 0l-.478-.372a.365.365 0 0 0-.51.063L4.566 9.879a.32.32 0 0 1-.484.033L1.891 7.769a.366.366 0 0 0-.515.006l-.423.433a.364.364 0 0 0 .006.514l3.258 3.185c.143.14.361.125.484-.033l6.272-8.048a.365.365 0 0 0-.063-.51z">
+                        </path>
+                    </svg>
+                </span>
+                <button aria-label="Message options" class="chat__msg-options"><svg
+                        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19 20" width="19" height="20"
+                        class="chat__msg-options-icon">
+                        <path fill="currentColor"
+                            d="M3.8 6.7l5.7 5.7 5.7-5.7 1.6 1.6-7.3 7.2-7.3-7.2 1.6-1.6z">
+                        </path>
+                    </svg>
+                </button>
+            </p>
+
+            <p class="chatMessage frnd-chat">
+                <span>Hello</span>
+                <span class="chat__msg-filler2"> </span>
+                <span class="msg-footer">
+                    <span>08:20 AM</span>
+                </span>
+                <button aria-label="Message options" class="chat__msg-options"><svg
+                        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19 20" width="19" height="20"
+                        class="chat__msg-options-icon">
+                        <path fill="currentColor"
+                            d="M3.8 6.7l5.7 5.7 5.7-5.7 1.6 1.6-7.3 7.2-7.3-7.2 1.6-1.6z">
+                        </path>
+                    </svg>
+                </button>
+            </p>
         </div>
         `;
-    } else {
-        content = `
-        <div class="text">
-            <span>
-                <strong>${name}</strong>: ${msg}
-            </span>
-            <span class="muted">
-                ${new Date().toLocaleString()}
-            </span>
-        </div>
-        `;
-    }
-    messages.innerHTML += content;
+
+        // content.messages.forEach(msg => {
+        //     const messageElement = document.createElement('p');
+        //     messageElement.className = `chatMessage ${msg.sender === 'me' ? 'my-chat' : 'frnd-chat'}`;
+
+        //     messageElement.innerHTML = `
+        //         <span>${msg.content}</span>
+        //         <span class="chat__msg-filler"></span>
+        //         <span class="msg-footer">
+        //             <span>${msg.timestamp}</span>
+        //             ${msg.sender === 'me' ? 
+        //                 `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 15" width="16" height="15" aria-label="read" class="chat-icon--blue">
+        //                     <path fill="currentColor"
+        //                         d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L8.666 9.879a.32.32 0 0 1-.484.033l-.358-.325a.319.319 0 0 0-.484.032l-.378.483a.418.418 0 0 0 .036.541l1.32 1.266c.143.14.361.125.484-.033l6.272-8.048a.366.366 0 0 0-.064-.512zm-4.1 0l-.478-.372a.365.365 0 0 0-.51.063L4.566 9.879a.32.32 0 0 1-.484.033L1.891 7.769a.366.366 0 0 0-.515.006l-.423.433a.364.364 0 0 0 .006.514l3.258 3.185c.143.14.361.125.484-.033l6.272-8.048a.365.365 0 0 0-.063-.51z"></path>
+        //                 </svg>` : ''}
+        //         </span>
+        //     `;
+        //     chatBox.appendChild(messageElement);
+        // });
+    
+    
+    
+     
 };
 
 // Handle incoming messages
 socketio.on("message", (data) => {
     if (data.message.startsWith("file:")) {
         const fileUrl = data.message.replace("file:", "");
-        console.log(data)
-        createMessage(data.name, fileUrl, true);
+        createMessage(data);
     } else {
-        console.log(data)
-        createMessage(data.name, data.message);
+        createMessage();
     }
 });
 
-// Send text message
-const sendMessage = () => {
-    const message = document.getElementById("messages");
-    if (message.value == "") return;
-    console.log("Sending message:", message.value);
-    socketio.emit("message", {data: message.value});
-    message.value = "";
-};
+
 
 // Send file
 const sendFile = () => {
