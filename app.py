@@ -1,7 +1,8 @@
-from flask import Flask,redirect,render_template,url_for,session,flash,request
+from flask import Flask,redirect,render_template,url_for,session,flash,request,send_from_directory
 import os
 from flask_sqlalchemy import SQLAlchemy
 from flask import jsonify
+from flask_socketio import send,SocketIO
 
 from flask_login import UserMixin, login_user, LoginManager,login_required, logout_user, current_user
 from webforms import LoginForm,RegistrationForm,GroupForm,JoinForm
@@ -12,6 +13,8 @@ from string import ascii_uppercase
 
 from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
+
+from werkzeug.utils import secure_filename
 
 from api_key import GITHUB_CLIENT_ID,GITHUB_CLIENT_SECRET,CLIENT_ID,CLIENT_SECRET
 
@@ -26,9 +29,20 @@ UPLOAD_FOLDER = 'uploads'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///chat.db'
 # Initialize the database
 db = SQLAlchemy(app)
+
+MAX_BUFFER_SIZE = 50 * 1000 * 1000  # 50 MB
+socketio = SocketIO(app,max_http_buffer_size=MAX_BUFFER_SIZE)
+
 migrate = Migrate(app, db)
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'pdf', 'txt', 'docx', 'xlsx'}
+def allowed_file(filename):
+    """
+    Check if the uploaded file is allowed based on its extension.
+    """
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # Flask Login Stuff
 login_manager = LoginManager()
@@ -63,7 +77,6 @@ github = oauth.register(
 )
 
 
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'pdf', 'txt', 'docx', 'xlsx'}
 
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
@@ -321,7 +334,53 @@ def home(username):
     
     return render_template("index.html",groups=groups,messages=messages,user=user)
 
+@app.route("/upload_file", methods=["POST","GET"])
+def upload_file():
+    if 'file' not in request.files:
+        return {"success": False, "message": "No file part"}
+    
+    file = request.files['file']
+    
+    if file.filename == '':
+        return {"success": False, "message": "No selected file"}
+    
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        file_url = url_for('uploaded_file', filename=filename)
+        return {"success": True, "file_url": file_url}
+    
+    return {"success": False, "message": "File type not allowed"}
 
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+
+@socketio.on("message") 
+def message(data):
+    room = session.get("room")
+    rooms = db.session.query(Users.room).distinct().all()
+    print(rooms)
+    rooms1 = []
+    for i in rooms:
+        for j in i:
+            rooms1.append(j)
+    if room not in rooms1:
+        return 
+    
+    content = {
+        "name": session.get("name"),
+        "message": data["data"]
+    }
+
+    # Save message to the database
+    new_message = Message(room=room, name=session.get("name"), content=data["data"])  # Create a new message instance
+    db.session.add(new_message)  # Add the message to the session
+    db.session.commit()  # Commit the session to save the message
+
+    send(content, to=room)
+    print(f"{session.get('name')} said: {data['data']}")
 
 ## Create Custom Error Pages
 # Invalid URL
@@ -330,4 +389,4 @@ def page_not_found(e):
 	return redirect(url_for("login")),401
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    socketio.run(app,debug=True)
