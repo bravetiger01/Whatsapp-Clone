@@ -70,6 +70,12 @@ if not os.path.exists(UPLOAD_FOLDER):
 
 # Database Models
 # --------------------------------------------Models----------------------------------------
+# Association table for Many-to-Many relationship between Users and Groups
+group_user_association = db.Table('group_user_association',
+    db.Column('group_id', db.Integer, db.ForeignKey('groups.id')),
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id'))
+)
+
 class Users(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(20), nullable=True, unique=True)
@@ -78,7 +84,9 @@ class Users(db.Model, UserMixin):
     date_join = db.Column(db.DateTime, default=datetime.now)
     # Do some password stuff!
     password_hash = db.Column(db.String(200),nullable=True)
-    group_id = db.Column(db.String(4),db.ForeignKey('groups.id'), nullable=True)
+    
+    # Relationship with groups (many-to-many)
+    groups = db.relationship('Groups', secondary=group_user_association, backref='members')
 
     @property
     def password(self):
@@ -108,11 +116,7 @@ class Groups(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(200), nullable=False,unique=True)
     code = db.Column(db.String(4), nullable=False,unique=True)
-    user_id = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text, nullable=True)
-    messages = db.Column(db.Text, db.ForeignKey('message.content'),nullable=True)
-
-    messages = db.relationship('Message', backref='group2', lazy=True)
 
 def generate_unique_code(length):
     """
@@ -175,7 +179,6 @@ def login():
                 # Check the hash
                 if check_password_hash(user.password_hash, loginform.password.data):
                     login_user(user)
-                    user = Users.query.filter_by(username=loginform.username.data).first()
                     session["name"] = loginform.username.data
                     session["id"] = user.id
                     return redirect(url_for('home',username=user.username))
@@ -216,7 +219,7 @@ def register():
         id = Users.query.filter_by(username=username).first()
         session["name"] = username
         session["id"] = id.id
-        return redirect(url_for('home', id=id.id))
+        return redirect(url_for('home',username=id.username))
     return render_template('login.html', signupform=signupform, loginform=loginform)
 
 @app.route("/addGroup/<username>", methods=["GET","POST"])
@@ -229,8 +232,9 @@ def addGroup(username):
         name = form.name.data
         description = form.description.data
         code = generate_unique_code(4)
-        new_group = Groups(name=name, description=description,user_id=user.id,code=code)
-        groups=Groups.query.filter_by(user_id=user.id)
+        new_group = Groups(name=name, description=description,code=code)
+        # groups=Groups.query.filter_by(user_id=user.id)
+        user.groups.append(new_group)
         db.session.add(new_group)
         db.session.commit()
         return redirect(url_for('home', username=username))
@@ -245,16 +249,18 @@ def joinGroup(username):
     user = Users.query.filter_by(username=username).first()
     if form.validate_on_submit():
         code = form.code.data
-        code1 = Groups.query.filter_by(code=code).first()
-        print(code1)
-            
-        user = Users.query.filter_by(name=username).first()
+        group = Groups.query.filter_by(code=code).first()
+        print(group)
+        user = Users.query.filter_by(username=username).first()
         print(user)
-        if code1:
+        if group:
             print("Hello World")
             session["room"] = code
             session["name"] = username
-                
+
+            user.groups.append(group)
+
+            db.session.commit()
                 
             return redirect(url_for("home", username=username))
         else:
@@ -304,13 +310,24 @@ def home(username):
             return redirect(url_for('login'))
 
 
-    
+    print(username)
     user = Users.query.filter_by(username=username).first()
-    groups = Groups.query.filter_by(user_id=user.id)
-    messages = Groups.query.filter_by(user_id=user.id)
+    print(user.id)
+    groups = user.groups
+
+    for group in groups:
+        print(group.name)
+    messages = Message.query.filter_by(user_id=user.id).all()
     
     return render_template("index.html",groups=groups,messages=messages,user=user)
 
+
+
+## Create Custom Error Pages
+# Invalid URL
+@app.errorhandler(401)
+def page_not_found(e):
+	return redirect(url_for("login")),401
 
 if __name__ == '__main__':
     app.run(debug=True)

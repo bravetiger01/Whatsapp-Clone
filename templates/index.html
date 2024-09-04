@@ -162,7 +162,7 @@
                 <!-- </div> -->
 
                 {% for group in groups %}
-                <div class="block chat-list" onclick="openRightSide('{{group.name}}')">
+                <div class="block chat-list" onclick="openRightSide('{{group.name}}','{{group.code}}')">
                     <!-- Img -->
                     <div class="imgBox">
                         <img src="{{ url_for('static', filename='images/Avatar-10.jpeg') }}" class="cover">

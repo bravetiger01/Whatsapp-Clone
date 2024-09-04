@@ -100,10 +100,10 @@ function closeForm() {
 }
 
 
-function openRightSide(name) {
+function openRightSide(name,code) {
     document.getElementById("rightSide").style.display = "flex";
     document.getElementById("Intro-Left").style.display = "none";
-    document.getElementById("Shayan").innerHTML = name;
+    document.getElementById("Shayan").innerHTML = `${name} - ${code}`;
 
 }
 
