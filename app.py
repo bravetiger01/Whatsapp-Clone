@@ -282,8 +282,40 @@ def joinGroup(username):
             return render_template("join_group.html",username=user.username)
     return render_template("join_group.html",joinform=form,user=user)
 
+@app.route('/get_messages/<group_name>')
+def get_messages(group_name):
+    print("Hello")
+    group = Groups.query.filter_by(name=group_name).first()
+    if not group:
+        return jsonify({"error": "Group not found"}), 404
+    
+    messages = Message.query.filter_by(group_id=group.id).order_by(Message.timestamp).all()
 
+    # Format the messages in a list of dictionaries
+    message_data = []
+    for msg in messages:
+        message_data.append({
+            "content": msg.content,
+            "sender_id": msg.user_id,
+            "timestamp": msg.timestamp.strftime('%Y-%m-%d %H:%M:%S')
+        })
+    
+    print(jsonify(message_data))
 
+    return message_data
+
+@app.route('/leave_group/<group_name>', methods=['POST','GET'])
+@login_required
+def leave_group(group_name):
+    group = Groups.query.get_or_404(group_name)
+    
+    if group in current_user.groups:
+        current_user.groups.remove(group)
+        db.session.commit()
+        print(f'You have left the group {group.name}.')
+    else:
+        print('You are not a member of this group.')
+    return redirect(url_for('home',username=current_user.username))
 
 @app.route("/", methods=["GET", "POST"])
 @app.route("/home/<username>", methods=["GET","POST"])
@@ -379,6 +411,8 @@ def message(data):
 
     # send(content, to=room)
     # print(f"{session.get('name')} said: {data['data']}")
+
+
 
 ## Create Custom Error Pages
 # Invalid URL

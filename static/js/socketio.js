@@ -18,6 +18,9 @@ if (event.key === "Enter") {
     sendMessage(group,user_id)
 }
 });
+
+
+
 // Send text message
 const sendMessage = (group,user_id) => {
     const message = document.getElementById("messages");
@@ -32,15 +35,15 @@ const sendMessage = (group,user_id) => {
 // Function to create and append a message element
 const createMessage = (content,sender_id) =>{
 
-
+    var message = "";
     const chatBox = document.getElementById('chatBox');
-    chatBox.innerHTML = ''; // Clear the chat box
-    
+    user_id = document.getElementById("user_id").innerHTML
     console.log(content)
-        content = `
+    if (sender_id == user_id){
+        message = `
         <div>
             <p class="chatMessage my-chat">
-                <span>Hello </span>
+                <span>${content} </span>
                 <span class="chat__msg-filler"> </span>
                 <span class="msg-footer">
                     <span>Hello2</span>
@@ -60,9 +63,12 @@ const createMessage = (content,sender_id) =>{
                     </svg>
                 </button>
             </p>
+        </div>`
+    }
 
-            <p class="chatMessage frnd-chat">
-                <span>Hello</span>
+    else{
+        message=`<p class="chatMessage frnd-chat">
+                <span>${content}</span>
                 <span class="chat__msg-filler2"> </span>
                 <span class="msg-footer">
                     <span>08:20 AM</span>
@@ -78,6 +84,10 @@ const createMessage = (content,sender_id) =>{
             </p>
         </div>
         `;
+    }
+        
+
+            
 
         // content.messages.forEach(msg => {
         //     const messageElement = document.createElement('p');
@@ -97,7 +107,7 @@ const createMessage = (content,sender_id) =>{
         //     `;
         //     chatBox.appendChild(messageElement);
         // });
-    
+        chatBox.innerHTML += message
     
     
      
@@ -109,7 +119,7 @@ socketio.on("message", (data) => {
         const fileUrl = data.message.replace("file:", "");
         createMessage(data);
     } else {
-        createMessage();
+        createMessage(data);
     }
 });
 
@@ -137,3 +147,22 @@ const sendFile = () => {
 
     fileInput.value = ""; // Clear the file input
 };
+
+function leaveGroup() {
+    group = document.getElementById("Group Name").innerHTML
+    if (confirm("Are you sure you want to leave this group?")) {
+        fetch(`/leave_group/${group}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token() }}'  // Make sure CSRF protection is in place
+            },
+        }).then(response => {
+            if (response.ok) {
+                window.location.reload();  // Reload the page after leaving the group
+            } else {
+                alert('Failed to leave the group.');
+            }
+        });
+    }
+}

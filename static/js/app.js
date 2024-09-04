@@ -104,8 +104,30 @@ function openRightSide(name,code,id) {
     document.getElementById("rightSide").style.display = "flex";
     document.getElementById("Intro-Left").style.display = "none";
     document.getElementById("Shayan").innerHTML = `${name} - ${code}`;
-    console.log(id)
-    sendMessage(code,id);
+    
+    // Clear the chat box before loading new messages
+    const chatBox = document.getElementById('chatBox');
+    chatBox.innerHTML = '';
+
+    console.log(name)
+
+    var responseClone; // 1
+
+    // Fetch the messages for the selected group
+    fetch(`/get_messages/${name}`)
+    .then(function(response){
+        responseClone = response.clone();
+        return response.json();
+    })
+    .then(messages => {
+        // Iterate over the fetched messages and display them
+        messages.forEach(message => {
+            createMessage(message.content, message.sender_id);
+        });
+    })
+    .catch(error => console.error('Error fetching messages:', error));
+    
+
 }
 
 function closeRightSide() {
@@ -135,6 +157,9 @@ function closeSearch() {
     document.getElementById("search-message").style.display = "none";
 }
 
+function myDrop(){
+    // document.getElementById("myDropdown").classList.toggle("show");
+}
 
 // Open group from new chat
 function openGroup() {
