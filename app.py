@@ -195,7 +195,8 @@ def login():
                     login_user(user)
                     session["name"] = loginform.username.data
                     session["id"] = user.id
-                    return redirect(url_for('home',username=user.username))
+                    # register -> home
+                    return redirect(url_for('chatroom',username=user.username))
                 else:
                     flash("Wrong Credentials - Try Again!", "danger")
             else:
@@ -233,7 +234,9 @@ def register():
         id = Users.query.filter_by(username=username).first()
         session["name"] = username
         session["id"] = id.id
-        return redirect(url_for('home',username=id.username))
+        # register->home
+        return redirect(url_for('chatroom',username=id.username))
+    
     return render_template('login.html', signupform=signupform, loginform=loginform)
 
 @app.route("/addGroup/<username>", methods=["GET","POST"])
@@ -251,7 +254,7 @@ def addGroup(username):
         user.groups.append(new_group)
         db.session.add(new_group)
         db.session.commit()
-        return redirect(url_for('home', username=username))
+        return redirect(url_for('chatroom', username=username))
 
     return render_template("add_group.html",groupform=form,user=user)
 
@@ -276,7 +279,7 @@ def joinGroup(username):
 
             db.session.commit()
                 
-            return redirect(url_for("home", username=username))
+            return redirect(url_for("chatroom", username=username))
         else:
             flash("Room not found.")
             return render_template("join_group.html",username=user.username)
@@ -314,7 +317,7 @@ def leave_group(group_name):
         current_user.groups.remove(group)
         db.session.commit()
         print(f'You have left the group {group.name}.')
-        return redirect(url_for('home',username=current_user.username))
+        return redirect(url_for('chatroom',username=current_user.username))
     else:
         print('You are not a member of this group.')
     
@@ -323,9 +326,9 @@ def leave_group(group_name):
     return message
 
 @app.route("/", methods=["GET", "POST"])
-@app.route("/home/<username>", methods=["GET","POST"])
+@app.route("/chatroom/<username>", methods=["GET","POST"])
 @login_required
-def home(username):
+def chatroom(username):
     # Load all users and their last message from the database
     # users = Users.query.all()
     # chats1 = []
