@@ -46,7 +46,6 @@ const createMessage = (content,sender_id,sender_name) =>{
                 <span>${content} </span>
                 <span class="chat__msg-filler"> </span>
                 <span class="msg-footer">
-                    <span style="margin: 1px; padding:5px opx;">${sender_name}</span>
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 15" width="16" height="15"
                         aria-label="read" class="chat-icon--blue">
                         <path fill="currentColor"

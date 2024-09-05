@@ -293,9 +293,11 @@ def get_messages(group_name):
     # Format the messages in a list of dictionaries
     message_data = []
     for msg in messages:
+        user = Users.query.filter_by(id=msg.user_id).first()
         message_data.append({
             "content": msg.content,
             "sender_id": msg.user_id,
+            "sender_name":user.username,
             "timestamp": msg.timestamp.strftime('%Y-%m-%d %H:%M:%S')
         })
     
