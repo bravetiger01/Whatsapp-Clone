@@ -284,7 +284,6 @@ def joinGroup(username):
 
 @app.route('/get_messages/<group_name>')
 def get_messages(group_name):
-    print("Hello")
     group = Groups.query.filter_by(name=group_name).first()
     if not group:
         return jsonify({"error": "Group not found"}), 404
@@ -307,15 +306,19 @@ def get_messages(group_name):
 @app.route('/leave_group/<group_name>', methods=['POST','GET'])
 @login_required
 def leave_group(group_name):
-    group = Groups.query.get_or_404(group_name)
+    group = Groups.query.filter_by(name=group_name).first_or_404()
     
     if group in current_user.groups:
         current_user.groups.remove(group)
         db.session.commit()
         print(f'You have left the group {group.name}.')
+        return redirect(url_for('home',username=current_user.username))
     else:
         print('You are not a member of this group.')
-    return redirect(url_for('home',username=current_user.username))
+    
+    message = "You are not a member of this group."
+
+    return message
 
 @app.route("/", methods=["GET", "POST"])
 @app.route("/home/<username>", methods=["GET","POST"])
