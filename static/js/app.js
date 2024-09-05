@@ -104,7 +104,7 @@ function openRightSide(name,code,id) {
     document.getElementById("rightSide").style.display = "flex";
     document.getElementById("Intro-Left").style.display = "none";
     document.getElementById("Shayan").innerHTML = `${name} - ${code}`;
-    
+    var sender_name = document.getElementById("username").innerHTML
     // Clear the chat box before loading new messages
     const chatBox = document.getElementById('chatBox');
     chatBox.innerHTML = '';
@@ -122,7 +122,7 @@ function openRightSide(name,code,id) {
     .then(messages => {
         // Iterate over the fetched messages and display them
         messages.forEach(message => {
-            createMessage(message.content, message.sender_id);
+            createMessage(message.content, message.sender_id, sender_name);
         });
     })
     .catch(error => console.error('Error fetching messages:', error));

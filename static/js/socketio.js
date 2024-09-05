@@ -33,7 +33,7 @@ const sendMessage = (group,user_id) => {
 
 
 // Function to create and append a message element
-const createMessage = (content,sender_id) =>{
+const createMessage = (content,sender_id,sender_name) =>{
 
     var message = "";
     const chatBox = document.getElementById('chatBox');
@@ -46,7 +46,7 @@ const createMessage = (content,sender_id) =>{
                 <span>${content} </span>
                 <span class="chat__msg-filler"> </span>
                 <span class="msg-footer">
-                    <span>Hello2</span>
+                    <span style="margin: 1px; padding:5px opx;">${sender_name}</span>
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 15" width="16" height="15"
                         aria-label="read" class="chat-icon--blue">
                         <path fill="currentColor"
@@ -71,7 +71,7 @@ const createMessage = (content,sender_id) =>{
                 <span>${content}</span>
                 <span class="chat__msg-filler2"> </span>
                 <span class="msg-footer">
-                    <span>08:20 AM</span>
+                    <span style="margin: 1px;">${sender_name}</span>
                 </span>
                 <button aria-label="Message options" class="chat__msg-options"><svg
                         xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19 20" width="19" height="20"
