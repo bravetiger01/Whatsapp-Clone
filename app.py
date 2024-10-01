@@ -27,7 +27,7 @@ app.config['SECRET_KEY'] = 'mysecretkey'
 UPLOAD_FOLDER = 'uploads'
 
 # SQLite Database Configuration
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///chat.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///whatsapp.db'
 # Initialize the database
 db = SQLAlchemy(app)
 
@@ -254,6 +254,7 @@ def addGroup(username):
         user.groups.append(new_group)
         db.session.add(new_group)
         db.session.commit()
+        
         return redirect(url_for('chatroom', username=username))
 
     return render_template("add_group.html",groupform=form,user=user)
@@ -278,6 +279,7 @@ def joinGroup(username):
             user.groups.append(group)
 
             db.session.commit()
+            
                 
             return redirect(url_for("chatroom", username=username))
         else:
@@ -408,6 +410,16 @@ def message(data):
         # Save message to the database
         db.session.add(new_message)  # Add the message to the session
         db.session.commit()  # Commit the session to save the message
+        # Prepare the content to be sent back to the group
+        content = {
+            "sender_id": data['sender_id'],
+            "message": data['data'],
+            "group_name": data['group_name'],
+            "timestamp": new_message.timestamp.strftime('%Y-%m-%d %H:%M:%S')
+        }
+        send(content, to=group.name)
+        # Broadcast the message to all clients in the group
+        socketio.emit("new_message", content, room=group.name)
         print("Sent!")
         
     

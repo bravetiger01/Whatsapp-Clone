@@ -1,5 +1,8 @@
+import {io} from "https://cdn.socket.io/4.3.2/socket.io.esm.min.js";
+
 var socketio = io();
-const messages = document.getElementById("messages");
+
+
 
 
 // Get the input field
@@ -10,12 +13,12 @@ input.addEventListener("keypress", function(event) {
 // If the user presses the "Enter" key on the keyboard
 if (event.key === "Enter") {
     // Cancel the default action, if needed
-    console.log("Sent!")
     event.preventDefault();
     group = document.getElementById("Group Name").innerHTML
     user_id = document.getElementById("user_id").innerHTML
     console.log(group,user_id)
     sendMessage(group,user_id)
+    console.log("Sent!")
 }
 });
 
@@ -27,14 +30,19 @@ const sendMessage = (group,user_id) => {
     if (message.value == "") return;
     console.log("Sending message:", message.value);
     socketio.emit("message", {data: message.value, group_name:group,sender_id:user_id});
+    var groupname = document.getElementById("Group Name").innerHTML;
+    var groupcode = document.getElementById("Group Code").innerHTML;
     createMessage(content=message.value,sender_id=user_id)
+
+    openRightSide(groupname,groupcode);
+
     message.value = "";
 };
 
 
 // Function to create and append a message element
-const createMessage = (content,sender_id,sender_name) =>{
-
+function createMessage(content,sender_id,sender_name) {
+    socketio.emit('refresh')
     var message = "";
     const chatBox = document.getElementById('chatBox');
     user_id = document.getElementById("user_id").innerHTML
@@ -102,6 +110,11 @@ socketio.on("message", (data) => {
 });
 
 
+
+socketio.on("new_message", (data) => {
+    console.log("New Message")
+}
+)
 
 // Send file
 const sendFile = () => {
