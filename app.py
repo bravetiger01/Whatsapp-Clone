@@ -2,7 +2,7 @@ from flask import Flask,redirect,render_template,url_for,session,flash,request,s
 import os
 from flask_sqlalchemy import SQLAlchemy
 from flask import jsonify
-from flask_socketio import send,SocketIO
+from flask_socketio import send,SocketIO,join_room
 
 from flask_login import UserMixin, login_user, LoginManager,login_required, logout_user, current_user
 from webforms import LoginForm,RegistrationForm,GroupForm,JoinForm
@@ -403,10 +403,12 @@ def message(data):
 
     # print(data)
     # print(data['group_name'])
-    group = Groups.query.filter_by(name=data['group_name']).first()
+    group = Groups.query.filter_by(code=data['group_code']).first()
     print(group)
     if group:
         new_message = Message(user_id=data['sender_id'],group_id=group.id,content=data['data'],timestamp=datetime.now())  # Create a new message instance
+        user = Users.query.filter_by(id=data['sender_id']).first()
+        print(user.username)
         # Save message to the database
         db.session.add(new_message)  # Add the message to the session
         db.session.commit()  # Commit the session to save the message
@@ -415,11 +417,13 @@ def message(data):
             "sender_id": data['sender_id'],
             "message": data['data'],
             "group_name": data['group_name'],
+            "group_code":data['group_code'],
+            "name":user.username,
             "timestamp": new_message.timestamp.strftime('%Y-%m-%d %H:%M:%S')
         }
         send(content, to=group.name)
         # Broadcast the message to all clients in the group
-        socketio.emit("new_message", content, room=group.name)
+        socketio.emit("messages", data=content)
         print("Sent!")
         
     
@@ -431,6 +435,9 @@ def message(data):
 
     # send(content, to=room)
     # print(f"{session.get('name')} said: {data['data']}")
+
+
+
 
 
 

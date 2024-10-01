@@ -1,4 +1,4 @@
-import {io} from "https://cdn.socket.io/4.3.2/socket.io.esm.min.js";
+
 
 var socketio = io();
 
@@ -7,6 +7,8 @@ var socketio = io();
 
 // Get the input field
 var input = document.getElementById("messages");
+var groupname;
+var groupcode;
 
 // Execute a function when the user presses a key on the keyboard
 input.addEventListener("keypress", function(event) {
@@ -14,10 +16,11 @@ input.addEventListener("keypress", function(event) {
 if (event.key === "Enter") {
     // Cancel the default action, if needed
     event.preventDefault();
-    group = document.getElementById("Group Name").innerHTML
+    groupname = groupnamefunc()
+    groupcode = groupcodefunc()
     user_id = document.getElementById("user_id").innerHTML
-    console.log(group,user_id)
-    sendMessage(group,user_id)
+    console.log(group,groupcode,user_id)
+    sendMessage(group,groupcode,user_id)
     console.log("Sent!")
 }
 });
@@ -25,16 +28,18 @@ if (event.key === "Enter") {
 
 
 // Send text message
-const sendMessage = (group,user_id) => {
+const sendMessage = (group,groupcode,user_id) => {
     const message = document.getElementById("messages");
     if (message.value == "") return;
     console.log("Sending message:", message.value);
-    socketio.emit("message", {data: message.value, group_name:group,sender_id:user_id});
-    var groupname = document.getElementById("Group Name").innerHTML;
-    var groupcode = document.getElementById("Group Code").innerHTML;
-    createMessage(content=message.value,sender_id=user_id)
-
-    openRightSide(groupname,groupcode);
+    console.log(groupcode)
+    content = {
+        data: message.value, 
+        group_name:group,
+        group_code:groupcode,
+        sender_id:user_id
+    }
+    socketio.emit("message", content);
 
     message.value = "";
 };
@@ -42,7 +47,7 @@ const sendMessage = (group,user_id) => {
 
 // Function to create and append a message element
 function createMessage(content,sender_id,sender_name) {
-    socketio.emit('refresh')
+    
     var message = "";
     const chatBox = document.getElementById('chatBox');
     user_id = document.getElementById("user_id").innerHTML
@@ -95,26 +100,35 @@ function createMessage(content,sender_id,sender_name) {
         
     chatBox.innerHTML += message;
     
+
+    
+    
     
      
 };
 
 // Handle incoming messages
-socketio.on("message", (data) => {
-    if (data.message.startsWith("file:")) {
-        const fileUrl = data.message.replace("file:", "");
-        createMessage(data);
-    } else {
-        createMessage(data);
+socketio.on("messages", (data) => {
+    console.log(data);
+    
+    var current_group = document.getElementById("Shayan").innerHTML;
+    var group_parts = current_group.split(" - ");
+    var current_group_name = group_parts[0].trim();  // Group name
+    var current_group_code = group_parts[1].trim();  // Group code (if available)
+
+
+
+    console.log(current_group_code);
+    console.log(data['group_code']);
+    if (current_group_code == data['group_code']){
+        createMessage(content=data['message'], sender_id=data['sender_id'],name=data['name']);
     }
+    
 });
 
 
 
-socketio.on("new_message", (data) => {
-    console.log("New Message")
-}
-)
+
 
 // Send file
 const sendFile = () => {
@@ -139,23 +153,23 @@ const sendFile = () => {
     fileInput.value = ""; // Clear the file input
 };
 
-function leaveGroup() {
-    group = document.getElementById("Shayan").innerHTML
-    group = group.split(" - ")[0];
-    console.log(group)
-    if (confirm("Are you sure you want to leave this group?")) {
-        fetch(`/leave_group/${group}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token() }}'  // Make sure CSRF protection is in place
-            },
-        }).then(response => {
-            if (response.ok) {
-                window.location.reload();  // Reload the page after leaving the group
-            } else {
-                alert('Failed to leave the group.');
-            }
-        });
-    }
-}
+// function leaveGroup() {
+//     group = document.getElementById("Shayan").innerHTML
+//     group = group.split(" - ")[0];
+//     console.log(group)
+//     if (confirm("Are you sure you want to leave this group?")) {
+//         fetch(`/leave_group/${group}`, {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//                 'X-CSRFToken': '{{ csrf_token() }}'  // Make sure CSRF protection is in place
+//             },
+//         }).then(response => {
+//             if (response.ok) {
+//                 window.location.reload();  // Reload the page after leaving the group
+//             } else {
+//                 alert('Failed to leave the group.');
+//             }
+//         });
+//     }
+// }

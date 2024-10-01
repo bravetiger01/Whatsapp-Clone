@@ -1,3 +1,9 @@
+
+var socketio = io()
+
+var group = "";
+var code1;
+
 // Dropdown Right Side
 $(document).ready(function () {
     $("#dropDown").click(function (event) {
@@ -110,7 +116,14 @@ function openRightSide(name,code) {
 
     console.log(name)
 
+    group = name;
+    code1 = code;
+    console.log(code)
+
     var responseClone; // 1
+
+    // Send an event to join the group (room)
+    socketio.emit("join_group", { group_name: name, group_code: code });
 
     // Fetch the messages for the selected group
     fetch(`/get_messages/${name}`)
@@ -126,7 +139,14 @@ function openRightSide(name,code) {
     })
     .catch(error => console.error('Error fetching messages:', error));
     
+}
 
+function groupnamefunc(){
+    return group;
+}
+
+function groupcodefunc(){
+    return code1;
 }
 
 function closeRightSide() {
