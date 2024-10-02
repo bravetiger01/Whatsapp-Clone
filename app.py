@@ -327,8 +327,12 @@ def leave_group(group_name):
 
     return message
 
-@app.route("/", methods=["GET", "POST"])
-@app.route("/chatroom/<username>", methods=["GET","POST"])
+
+@app.route("/")
+def home():
+    return redirect(url_for('login'))
+
+@app.route("/<username>", methods=["GET","POST"])
 @login_required
 def chatroom(username):
     # Load all users and their last message from the database
