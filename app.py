@@ -16,7 +16,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 from werkzeug.utils import secure_filename
 
-from api_key import GITHUB_CLIENT_ID,GITHUB_CLIENT_SECRET,CLIENT_ID,CLIENT_SECRET
+import os
 
 import random
 import time
@@ -55,8 +55,8 @@ oauth = OAuth(app)
 
 google = oauth.register(
     name='google',
-    client_id=CLIENT_ID,
-    client_secret=CLIENT_SECRET,
+    client_id=os.getenv("CLIENT_ID"),
+    client_secret=os.getenv("CLIENT_SECRET"),
     authorize_url='https://accounts.google.com/o/oauth2/v2/auth',
     access_token_url="https://oauth2.googleapis.com/token",
     authorization_base_url="https://accounts.google.com/o/oauth2/v2/auth",
@@ -68,8 +68,8 @@ google = oauth.register(
 
 github = oauth.register(
     name='github',
-    client_id=GITHUB_CLIENT_ID,
-    client_secret=GITHUB_CLIENT_SECRET,
+    client_id=os.getenv("GITHUB_CLIENT_ID"),
+    client_secret=os.getenv("GITHUB_CLIENT_SECRET"),
     authorize_url='https://github.com/login/oauth/authorize',
     authorize_params=None,
     access_token_url='https://github.com/login/oauth/access_token',
